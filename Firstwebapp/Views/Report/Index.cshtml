@@ -1,0 +1,690 @@
+﻿@model Thekdar.ViewModels.ReportsViewModel
+@using Thekdar.Models
+
+@{
+ViewData["Title"] = "Reports";
+var currentTab = ViewBag.CurrentTab as string ?? "jobs";
+var fromDate = ViewBag.FromDate as string;
+var toDate = ViewBag.ToDate as string;
+var statusFilter = ViewBag.StatusFilter as string ?? "all";
+var contractorFilter = ViewBag.ContractorFilter as int?;
+var tradeFilter = ViewBag.TradeFilter as string ?? "all";
+var searchTitle = ViewBag.SearchTitle as string ?? "";
+var contractors = ViewBag.Contractors as List<dynamic> ?? new();
+var trades = ViewBag.Trades as List<string> ?? new();
+}
+
+<div class="container-fluid px-2 px-md-3 py-3">
+
+    <!-- HEADER -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2 mb-3">
+        <h4 class="mb-0"><i class="fas fa-chart-line text-primary me-2"></i>Reports Dashboard</h4>
+        <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-success" onclick="exportCSV()"><i class="fas fa-file-csv me-1"></i>Export CSV</button>
+            <button class="btn btn-sm btn-secondary" onclick="resetFilters()"><i class="fas fa-undo-alt me-1"></i>Reset</button>
+        </div>
+    </div>
+
+    <!-- FILTERS - Stack on mobile -->
+    <form method="get" id="filterForm" class="card mb-3 p-3">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="tab" id="tabInput" value="@currentTab" />
+
+        <div class="row g-2">
+            <!-- Search by Job Title -->
+            <div class="col-12 col-md-3">
+                <label class="form-label fw-semibold small">Search Job Title</label>
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" name="searchTitle" class="form-control"
+                           placeholder="Type job title..."
+                           value="@searchTitle" />
+                </div>
+            </div>
+
+            <div class="col-6 col-md-2">
+                <label class="form-label fw-semibold small">From Date</label>
+                <input type="date" name="fromDate" class="form-control form-control-sm" value="@fromDate" />
+            </div>
+
+            <div class="col-6 col-md-2">
+                <label class="form-label fw-semibold small">To Date</label>
+                <input type="date" name="toDate" class="form-control form-control-sm" value="@toDate" />
+            </div>
+
+            <div class="col-6 col-md-2">
+                <label class="form-label fw-semibold small">Status</label>
+                <select name="status" class="form-select form-select-sm">
+                    <option value="all" selected="@(statusFilter == "all")">All</option>
+                    <option value="active" selected="@(statusFilter == "active")">Active</option>
+                    <option value="pending" selected="@(statusFilter == "pending")">Pending</option>
+                    <option value="completed" selected="@(statusFilter == "completed")">Completed</option>
+                </select>
+            </div>
+
+            <div class="col-6 col-md-2">
+                <label class="form-label fw-semibold small">Contractor</label>
+                <select name="contractorId" class="form-select form-select-sm">
+                    <option value="">All</option>
+                    @foreach (var c in contractors)
+                    {
+                    <option value="@c.Id" selected="@(contractorFilter == c.Id)">
+                        @c.Name
+                    </option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-6 col-md-2" id="tradeFilterContainer" style="display: @(currentTab == "workers" ? "block" : "none")">
+                <label class="form-label fw-semibold small">Trade</label>
+                <select name="trade" class="form-select form-select-sm">
+                    <option value="all" selected="@(tradeFilter == "all")">All Trades</option>
+                    @foreach (var t in trades)
+                    {
+                    <option value="@t" selected="@(tradeFilter == t)">@t</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-12 col-md-1">
+                <button type="submit" class="btn btn-primary btn-sm w-100 mt-md-3"><i class="fas fa-search me-1"></i>Apply</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- TABS - Responsive tabs -->
+    <ul class="nav nav-tabs mb-3 flex-nowrap overflow-auto pb-1" style="flex-wrap: nowrap; overflow-x: auto;">
+        <li class="nav-item flex-shrink-0">
+            <a class="nav-link @(currentTab == "jobs" ? "active" : "")" href="#" onclick="switchTab('jobs'); return false;">
+                <i class="fas fa-briefcase me-1"></i>Jobs
+            </a>
+        </li>
+        <li class="nav-item flex-shrink-0">
+            <a class="nav-link @(currentTab == "contractors" ? "active" : "")" href="#" onclick="switchTab('contractors'); return false;">
+                <i class="fas fa-hard-hat me-1"></i>Contractors
+            </a>
+        </li>
+        <li class="nav-item flex-shrink-0">
+            <a class="nav-link @(currentTab == "workers" ? "active" : "")" href="#" onclick="switchTab('workers'); return false;">
+                <i class="fas fa-users me-1"></i>Workers
+            </a>
+        </li>
+        <li class="nav-item flex-shrink-0">
+            <a class="nav-link @(currentTab == "assignments" ? "active" : "")" href="#" onclick="switchTab('assignments'); return false;">
+                <i class="fas fa-tasks me-1"></i>Assignments
+            </a>
+        </li>
+    </ul>
+
+    <!-- ACTIVE FILTERS BADGES -->
+    <div class="mb-3 d-flex flex-wrap gap-1">
+        @if (!string.IsNullOrEmpty(searchTitle))
+        {
+        <span class="badge bg-primary"><i class="fas fa-search me-1"></i>@searchTitle</span>
+        }
+        @if (statusFilter != "all")
+        {
+        <span class="badge bg-secondary">Status: @statusFilter</span>
+        }
+        @if (contractorFilter.HasValue)
+        {
+        <span class="badge bg-secondary">Contractor filtered</span>
+        }
+        @if (tradeFilter != "all" && currentTab == "workers")
+        {
+        <span class="badge bg-secondary">Trade: @tradeFilter</span>
+        }
+        @if (!string.IsNullOrEmpty(fromDate) && !string.IsNullOrEmpty(toDate))
+        {
+        <span class="badge bg-secondary">@fromDate - @toDate</span>
+        }
+    </div>
+
+    <!-- CONTENT -->
+    <div class="card">
+        <div class="card-body p-2 p-md-3">
+
+            @* ================= JOBS TAB ================= *@
+            @if (currentTab == "jobs")
+            {
+            <!-- Summary Cards - Responsive -->
+            <div class="row g-2 mb-3">
+                <div class="col-6 col-md-3">
+                    <div class="card p-2 text-center border-0 shadow-sm bg-light">
+                        <i class="fas fa-briefcase fs-4 text-primary mb-1"></i>
+                        <h5 class="mb-0">@Model.TotalJobs</h5>
+                        <small class="text-muted">Total Jobs</small>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="card p-2 text-center border-0 shadow-sm bg-light">
+                        <i class="fas fa-play fs-4 text-info mb-1"></i>
+                        <h5 class="mb-0">@Model.ActiveJobs</h5>
+                        <small class="text-muted">Active</small>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="card p-2 text-center border-0 shadow-sm bg-light">
+                        <i class="fas fa-clock fs-4 text-warning mb-1"></i>
+                        <h5 class="mb-0">@Model.PendingJobs</h5>
+                        <small class="text-muted">Pending</small>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="card p-2 text-center border-0 shadow-sm bg-light">
+                        <i class="fas fa-check-circle fs-4 text-success mb-1"></i>
+                        <h5 class="mb-0">@Model.CompletedJobs</h5>
+                        <small class="text-muted">Completed</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Card View for Jobs -->
+            <div class="d-block d-md-none">
+                <div class="row g-2">
+                    @foreach (var j in Model.Jobs)
+                    {
+                    <div class="col-12">
+                        <div class="card shadow-sm">
+                            <div class="card-body p-3">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h6 class="fw-semibold mb-0">@j.Title</h6>
+                                    @if (j.Status == JobStatus.Active)
+                                    {
+                                    <span class="badge bg-primary">Active</span>
+                                    }
+                                    else if (j.Status == JobStatus.PendingConfirmation)
+                                    {
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                    }
+                                    else
+                                    {
+                                    <span class="badge bg-success">Completed</span>
+                                    }
+                                </div>
+                                <div class="small text-muted mb-2">
+                                    <div><i class="fas fa-user-tie me-1 w-2"></i> @j.ClientName</div>
+                                    <div><i class="fas fa-calendar-alt me-1 w-2"></i> @(j.ScheduledDate?.ToString("MMM dd, yyyy") ?? "Not scheduled")</div>
+                                    <div><i class="fas fa-user me-1 w-2"></i> @j.CreatedBy</div>
+                                    <div><i class="fas fa-users me-1 w-2"></i> @j.WorkersAssigned worker@(j.WorkersAssigned != 1 ? "s" : "")</div>
+                                </div>
+                                <div class="mt-2">
+                                    <a asp-action="Details" asp-controller="Job" asp-route-id="@j.Id"
+                                       class="btn btn-sm btn-outline-secondary w-100">
+                                        <i class="fas fa-eye me-1"></i>View Details
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Desktop Table View for Jobs -->
+            <div class="d-none d-md-block">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle table-sm">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Title</th>
+                                <th>Client</th>
+                                <th>Scheduled</th>
+                                <th>Status</th>
+                                <th>Contractor</th>
+                                <th>Workers</th>
+                                <th></th>
+                            </thead>
+                            <tbody>
+                            @foreach (var j in Model.Jobs)
+                            {
+                            <tr>
+                                <td class="fw-semibold">@j.Title</td>
+                                <td>@j.ClientName</td>
+                                <td>@(j.ScheduledDate?.ToString("MMM dd") ?? "â€”")</td>
+                                <td>
+                                    @if (j.Status == JobStatus.Active)
+                                    {
+                                    <span class="badge bg-primary">Active</span>
+                                    }
+                                    else if (j.Status == JobStatus.PendingConfirmation)
+                                    {
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                    }
+                                    else
+                                    {
+                                    <span class="badge bg-success">Completed</span>
+                                    }
+                                </td>
+                                <td>@j.CreatedBy</td>
+                                <td><span class="badge bg-secondary">@j.WorkersAssigned</span></td>
+                                <td>
+                                    <a asp-action="Details" asp-controller="Job" asp-route-id="@j.Id"
+                                       class="btn btn-sm btn-outline-secondary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            }
+                            </tbody>
+                        </table>
+                </div>
+            </div>
+
+            @if (!Model.Jobs.Any())
+            {
+            <div class="text-center py-4 text-muted">
+                <i class="fas fa-inbox fa-3x mb-2"></i>
+                <p>No jobs found for the selected filters.</p>
+                <button class="btn btn-sm btn-outline-primary" onclick="resetFilters()">Clear Filters</button>
+            </div>
+            }
+            }
+
+            @* ================= CONTRACTORS TAB ================= *@
+            @if (currentTab == "contractors")
+            {
+            <!-- Summary Cards -->
+            <div class="row g-2 mb-3">
+                <div class="col-6 col-md-4">
+                    <div class="card p-2 text-center border-0 shadow-sm bg-light">
+                        <i class="fas fa-users fs-4 text-primary mb-1"></i>
+                        <h5 class="mb-0">@Model.TotalContractors</h5>
+                        <small>Total</small>
+                    </div>
+                </div>
+                <div class="col-6 col-md-4">
+                    <div class="card p-2 text-center border-0 shadow-sm bg-light">
+                        <i class="fas fa-check-circle fs-4 text-success mb-1"></i>
+                        <h5 class="mb-0">@Model.ActiveContractors</h5>
+                        <small>Active</small>
+                    </div>
+                </div>
+                <div class="col-6 col-md-4">
+                    <div class="card p-2 text-center border-0 shadow-sm bg-light">
+                        <i class="fas fa-ban fs-4 text-secondary mb-1"></i>
+                        <h5 class="mb-0">@Model.InactiveContractors</h5>
+                        <small>Inactive</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Card View -->
+            <div class="d-block d-md-none">
+                <div class="row g-2">
+                    @foreach (var c in Model.Contractors)
+                    {
+                    <div class="col-12">
+                        <div class="card shadow-sm">
+                            <div class="card-body p-3">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h6 class="fw-semibold mb-0">@c.Name</h6>
+                                    @if (c.Status == "Active")
+                                    {
+                                    <span class="badge bg-success">Active</span>
+                                    }
+                                    else
+                                    {
+                                    <span class="badge bg-secondary">Inactive</span>
+                                    }
+                                </div>
+                                <div class="small text-muted mb-2">
+                                    <div><i class="fas fa-envelope me-1"></i> @c.Email</div>
+                                    <div><i class="fas fa-phone me-1"></i> @c.Phone</div>
+                                    <div><i class="fas fa-briefcase me-1"></i> Jobs: @c.JobsCreated</div>
+                                    <div><i class="fas fa-users me-1"></i> Workers: @c.WorkersManaged</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Desktop Table with Eye Icon -->
+            <div class="d-none d-md-block">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle table-sm">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Jobs</th>
+                                <th>Workers</th>
+                                <th>Status</th>
+                                <th style="width: 8%">Actions</th>
+                            </thead>
+                            <tbody>
+                            @foreach (var c in Model.Contractors)
+                            {
+                            <tr>
+                                <td class="fw-semibold">@c.Name</td>
+                                <td>@c.Email</td>
+                                <td>@c.Phone</td>
+                                <td><span class="badge bg-primary">@c.JobsCreated</span></td>
+                                <td><span class="badge bg-info">@c.WorkersManaged</span></td>
+                                <td>
+                                    @if (c.Status == "Active")
+                                    {
+                                    <span class="badge bg-success">Active</span>
+                                    }
+                                    else
+                                    {
+                                    <span class="badge bg-secondary">Inactive</span>
+                                    }
+                                </td>
+                                <td>
+                                    <a asp-action="ContractorDetails" asp-route-id="@c.Id" target="_blank" 
+                                       class="btn btn-sm btn-outline-primary" title="View Contractor Dashboard">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            }
+                            </tbody>
+                        </table>
+                </div>
+            </div>
+            @if (!Model.Contractors.Any())
+            {
+            <div class="text-center py-4 text-muted">
+                <i class="fas fa-inbox fa-3x mb-2"></i>
+                <p>No contractors found.</p>
+            </div>
+            }
+            }
+
+            @* ================= WORKERS TAB ================= *@
+            @if (currentTab == "workers")
+            {
+            <!-- Summary Cards -->
+            <div class="row g-2 mb-3">
+                <div class="col-4">
+                    <div class="card p-2 text-center border-0 shadow-sm bg-light">
+                        <i class="fas fa-users fs-4 text-primary mb-1"></i>
+                        <h5 class="mb-0">@Model.TotalWorkers</h5>
+                        <small>Total</small>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="card p-2 text-center border-0 shadow-sm bg-light">
+                        <i class="fas fa-user-check fs-4 text-success mb-1"></i>
+                        <h5 class="mb-0">@Model.AvailableWorkers</h5>
+                        <small>Available</small>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="card p-2 text-center border-0 shadow-sm bg-light">
+                        <i class="fas fa-briefcase fs-4 text-info mb-1"></i>
+                        <h5 class="mb-0">@Model.AssignedWorkers</h5>
+                        <small>Assigned</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Card View -->
+            <div class="d-block d-md-none">
+                <div class="row g-2">
+                    @foreach (var w in Model.Workers)
+                    {
+                    <div class="col-12">
+                        <div class="card shadow-sm">
+                            <div class="card-body p-3">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    @if (!string.IsNullOrEmpty(w.ProfilePicturePath))
+                                    {
+                                    <img src="@w.ProfilePicturePath" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;" />
+                                    }
+                                    else
+                                    {
+                                    <i class="fas fa-user-circle fa-2x text-muted"></i>
+                                    }
+                                    <div>
+                                        <h6 class="fw-semibold mb-0">@w.FullName</h6>
+                                        <span class="badge bg-info small">@w.Trade</span>
+                                    </div>
+                                </div>
+                                <div class="small text-muted mb-2">
+                                    <div><i class="fas fa-phone me-1"></i> @w.Phone</div>
+                                    <div><i class="fas fa-money-bill-wave me-1"></i> NPR @w.DailyRate.ToString("N0")</div>
+                                    <div><i class="fas fa-briefcase me-1"></i> @w.AssignedJobs jobs assigned</div>
+                                    <div><i class="fas fa-building me-1"></i> @w.ContractorName</div>
+                                </div>
+                                <div>
+                                    @if (w.IsAvailable)
+                                    {
+                                    <span class="badge bg-success">Available</span>
+                                    }
+                                    else
+                                    {
+                                    <span class="badge bg-secondary">Unavailable</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Desktop Table with Eye Icon -->
+            <div class="d-none d-md-block">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle table-sm">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Name</th>
+                                <th>Trade</th>
+                                <th>Phone</th>
+                                <th>Rate</th>
+                                <th>Assigned</th>
+                                <th>Contractor</th>
+                                <th>Status</th>
+                                <th style="width: 8%">Actions</th>
+                            </thead>
+                            <tbody>
+                            @foreach (var w in Model.Workers)
+                            {
+                            <tr>
+                                <td class="fw-semibold">
+                                    @if (!string.IsNullOrEmpty(w.ProfilePicturePath))
+                                    {
+                                    <img src="@w.ProfilePicturePath" class="rounded-circle me-1" style="width: 28px; height: 28px; object-fit: cover;" />
+                                    }
+                                    @w.FullName
+                                </td>
+                                <td><span class="badge bg-info">@w.Trade</span></td>
+                                <td>@w.Phone</td>
+                                <td>NPR @w.DailyRate.ToString("N0")</td>
+                                <td><span class="badge bg-primary">@w.AssignedJobs</span></td>
+                                <td>@w.ContractorName</td>
+                                <td>
+                                    @if (w.IsAvailable)
+                                    {
+                                    <span class="badge bg-success">Available</span>
+                                    }
+                                    else
+                                    {
+                                    <span class="badge bg-secondary">Unavailable</span>
+                                    }
+                                </td>
+                                <td>
+                                    <a asp-action="WorkerDetails" asp-route-id="@w.Id" target="_blank" 
+                                       class="btn btn-sm btn-outline-primary" title="View Worker Dashboard">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            }
+                            </tbody>
+                        </table>
+                </div>
+            </div>
+            @if (!Model.Workers.Any())
+            {
+            <div class="text-center py-4 text-muted">
+                <i class="fas fa-inbox fa-3x mb-2"></i>
+                <p>No workers found for the selected filters.</p>
+            </div>
+            }
+            }
+
+            @* ================= ASSIGNMENTS TAB ================= *@
+            @if (currentTab == "assignments")
+            {
+            <!-- Summary Cards -->
+            <div class="row g-2 mb-3">
+                <div class="col-4">
+                    <div class="card p-2 text-center border-0 shadow-sm bg-light">
+                        <i class="fas fa-tasks fs-4 text-primary mb-1"></i>
+                        <h5 class="mb-0">@Model.TotalAssignments</h5>
+                        <small>Total</small>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="card p-2 text-center border-0 shadow-sm bg-light">
+                        <i class="fas fa-play fs-4 text-info mb-1"></i>
+                        <h5 class="mb-0">@Model.ActiveAssignments</h5>
+                        <small>Active</small>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="card p-2 text-center border-0 shadow-sm bg-light">
+                        <i class="fas fa-check-double fs-4 text-success mb-1"></i>
+                        <h5 class="mb-0">@Model.CompletedAssignments</h5>
+                        <small>Completed</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Card View -->
+            <div class="d-block d-md-none">
+                <div class="row g-2">
+                    @foreach (var a in Model.Assignments)
+                    {
+                    <div class="col-12">
+                        <div class="card shadow-sm">
+                            <div class="card-body p-3">
+                                <h6 class="fw-semibold mb-1">@a.JobTitle</h6>
+                                <div class="small text-muted mb-2">
+                                    <div><i class="fas fa-user-tie me-1"></i> @a.ClientName</div>
+                                    <div><i class="fas fa-user me-1"></i> @a.WorkerName <span class="badge bg-info">@a.Role</span></div>
+                                    <div><i class="fas fa-calendar-alt me-1"></i> @a.AssignedDate.ToString("MMM dd, yyyy")</div>
+                                    <div><i class="fas fa-building me-1"></i> @a.ContractorName</div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mt-2">
+                                    @if (a.JobStatus == "Active")
+                                    {
+                                    <span class="badge bg-primary">Active</span>
+                                    }
+                                    else if (a.JobStatus == "Pending")
+                                    {
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                    }
+                                    else
+                                    {
+                                    <span class="badge bg-success">Completed</span>
+                                    }
+                                    <a asp-action="Details" asp-controller="Job" asp-route-id="@a.JobId"
+                                       class="btn btn-sm btn-outline-secondary">
+                                        <i class="fas fa-eye"></i> View Job
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Desktop Table -->
+            <div class="d-none d-md-block">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle table-sm">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Job Title</th>
+                                <th>Client</th>
+                                <th>Worker</th>
+                                <th>Role</th>
+                                <th>Assigned Date</th>
+                                <th>Status</th>
+                                <th></th>
+                            </thead>
+                            <tbody>
+                            @foreach (var a in Model.Assignments)
+                            {
+                            <tr>
+                                <td class="fw-semibold">@a.JobTitle</td>
+                                <td>@a.ClientName</td>
+                                <td>@a.WorkerName <small class="text-muted">(@a.Trade)</small></td>
+                                <td><span class="badge bg-info">@a.Role</span></td>
+                                <td class="small">@a.AssignedDate.ToString("MMM dd")</td>
+                                <td>
+                                    @if (a.JobStatus == "Active")
+                                    {
+                                    <span class="badge bg-primary">Active</span>
+                                    }
+                                    else if (a.JobStatus == "Pending")
+                                    {
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                    }
+                                    else
+                                    {
+                                    <span class="badge bg-success">Completed</span>
+                                    }
+                                </td>
+                                <td>
+                                    <a asp-action="Details" asp-controller="Job" asp-route-id="@a.JobId"
+                                       class="btn btn-sm btn-outline-secondary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            }
+                            </tbody>
+                        </table>
+                </div>
+            </div>
+            @if (!Model.Assignments.Any())
+            {
+            <div class="text-center py-4 text-muted">
+                <i class="fas fa-inbox fa-3x mb-2"></i>
+                <p>No assignments found for the selected filters.</p>
+            </div>
+            }
+            }
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script src="~/js/reports.js"></script>
+<script>
+    // Initialize trade filter visibility on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentTab = '@currentTab';
+        const tradeFilter = document.getElementById('tradeFilterContainer');
+        if (tradeFilter) {
+            tradeFilter.style.display = currentTab === 'workers' ? 'block' : 'none';
+        }
+    });
+
+    // Reset filters function
+    function resetFilters() {
+        const form = document.getElementById('filterForm');
+        form.querySelectorAll('select').forEach(select => {
+            select.selectedIndex = 0;
+        });
+        form.querySelectorAll('input[type="date"]').forEach(input => {
+            input.value = '';
+        });
+        form.querySelectorAll('input[type="text"]').forEach(input => {
+            input.value = '';
+        });
+        form.submit();
+    }
+</script>
+}

@@ -1,0 +1,209 @@
+﻿@model Thekdar.ViewModels.UserEditViewModel
+@using Thekdar.Models
+
+@{
+    ViewData["Title"] = "Edit Contractor";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-warning text-white">
+                    <h4 class="mb-0"><i class="fas fa-user-edit me-2"></i>Edit Contractor</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="HasProfilePicture" />
+
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label fw-semibold">
+                                <i class="fas fa-user me-1 text-muted"></i>Full Name
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                <input asp-for="Name" class="form-control" />
+                            </div>
+                            <span asp-validation-for="Name" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label fw-semibold">
+                                <i class="fas fa-envelope me-1 text-muted"></i>Email Address
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                <input asp-for="Email" class="form-control" type="email" />
+                            </div>
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Phone" class="form-label fw-semibold">
+                                <i class="fas fa-phone me-1 text-muted"></i>Phone Number
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                <input asp-for="Phone" class="form-control" />
+                            </div>
+                            <span asp-validation-for="Phone" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Age" class="form-label fw-semibold">
+                                <i class="fas fa-calendar-alt me-1 text-muted"></i>Age
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                                <input asp-for="Age" class="form-control" type="number" />
+                            </div>
+                            <span asp-validation-for="Age" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Profile Picture -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">
+                                <i class="fas fa-camera me-1 text-muted"></i>Profile Picture
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-image"></i></span>
+                                <input asp-for="ProfilePicture" class="form-control" accept="image/*" />
+                            </div>
+    
+                            @if (Model.HasProfilePicture)
+                            {
+                                <div class="mt-2">
+                                    <img src="@Url.Action("GetProfilePicture", "User", new { id = Model.Id })" 
+                                         alt="Profile" class="rounded-circle" style="width: 80px; height: 80px; object-fit: cover; border: 2px solid #3b82f6;" />
+                                    <small class="d-block text-muted mt-1">Current picture (upload new to replace)</small>
+                                </div>
+                            }
+                            <small class="text-muted">Leave empty to keep current picture</small>
+                        </div>
+
+                        <!-- Role (Admin can change role) -->
+                        <div class="mb-3">
+                            <label asp-for="Role" class="form-label fw-semibold">
+                                <i class="fas fa-user-tag me-1 text-muted"></i>Role
+                            </label>
+                            <select asp-for="Role" class="form-select"
+                                    onchange="return confirm('Are you sure you want to change this contractor\'s role?')">
+                                <option value="@UserRole.Contractor">Contractor Can manage jobs and employees</option>
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <option value="@UserRole.Admin">Admin Full system access</option>
+                                }
+                            </select>
+                            <div class="form-text text-muted">
+                                <i class="fas fa-info-circle text-info me-1"></i>
+                                Contractors can manage jobs and employees. Admins have full access.
+                            </div>
+                            <span asp-validation-for="Role" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="NewPassword" class="form-label fw-semibold">
+                                <i class="fas fa-key me-1 text-muted"></i>Reset Login Password
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                <input asp-for="NewPassword" type="password" class="form-control" id="newPasswordInput" placeholder="Leave empty to keep current password" />
+                                <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('newPasswordInput', this)" title="Show/Hide password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <span asp-validation-for="NewPassword" class="text-danger small"></span>
+                            <div class="form-text text-muted">
+                                Current passwords cannot be viewed. Enter a new password only if you want to replace it.
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ConfirmNewPassword" class="form-label fw-semibold">
+                                <i class="fas fa-check-double me-1 text-muted"></i>Confirm New Password
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                <input asp-for="ConfirmNewPassword" type="password" class="form-control" id="confirmNewPasswordInput" placeholder="Repeat new password" />
+                                <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('confirmNewPasswordInput', this)" title="Show/Hide password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <span asp-validation-for="ConfirmNewPassword" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Status -->
+                        <div class="mb-4">
+                            <label asp-for="Status" class="form-label fw-semibold">
+                                <i class="fas fa-toggle-on me-1 text-muted"></i>Account Status
+                            </label>
+                            <select asp-for="Status" class="form-select">
+                                <option value="@UserStatus.Active">Active Can log in and use the system</option>
+                                <option value="@UserStatus.Inactive">Inactive Cannot log in</option>
+                            </select>
+                            <div class="form-text text-muted">
+                                <i class="fas fa-exclamation-triangle text-warning me-1"></i>
+                                Inactive users cannot log in to the system.
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-warning flex-fill"
+                                    onclick="return confirm('Save changes to this contractor?')">
+                                <i class="fas fa-save me-2"></i>Save Changes
+                            </button>
+                            <a asp-action="List" class="btn btn-outline-secondary flex-fill">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function togglePassword(inputId, button) {
+            const input = document.getElementById(inputId);
+            const icon = button.querySelector('i');
+            if (!input || !icon) return;
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // Real-time phone validation (10 digits)
+        const phoneInput = document.getElementById('Phone');
+        if (phoneInput) {
+            phoneInput.addEventListener('input', function(e) {
+                let value = this.value.replace(/\D/g, '');
+                if (value.length > 10) value = value.slice(0, 10);
+                this.value = value;
+                
+                const errorSpan = document.getElementById('Phone-error');
+                if (value.length === 10) {
+                    this.classList.add('is-valid');
+                    this.classList.remove('is-invalid');
+                } else if (value.length > 0) {
+                    this.classList.add('is-invalid');
+                    this.classList.remove('is-valid');
+                } else {
+                    this.classList.remove('is-valid', 'is-invalid');
+                }
+            });
+        }
+    </script>
+}

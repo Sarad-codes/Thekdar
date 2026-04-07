@@ -1,0 +1,376 @@
+﻿@model IEnumerable<Thekdar.Models.JobModel>
+@using Thekdar.Models
+@using System.Security.Claims
+
+@{
+    ViewData["Title"] = "Jobs";
+    int? currentUserId = null;
+    if (int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var uid))
+        currentUserId = uid;
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-briefcase me-2"></i>Jobs</h2>
+        @if (User.IsInRole("Admin") || User.IsInRole("Contractor"))
+        {
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>New Job
+            </a>
+        }
+    </div>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+            <i class="fas fa-exclamation-circle me-2"></i>@TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5 text-muted">
+            <i class="fas fa-briefcase fa-4x mb-3"></i>
+            <p class="fs-5">No jobs yet.</p>
+            @if (User.IsInRole("Admin") || User.IsInRole("Contractor"))
+            {
+                <a asp-action="Create" class="btn btn-primary mt-2">
+                    <i class="fas fa-plus me-2"></i>Create First Job
+                </a>
+            }
+        </div>
+    }
+    else
+    {
+        <!-- Desktop Table View -->
+        <div class="d-none d-md-block">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th style="width: 25%">Title</th>
+                                    <th style="width: 15%">Client</th>
+                                    <th style="width: 20%">Address</th>
+                                    <th style="width: 12%">Scheduled</th>
+                                    <th style="width: 10%">Status</th>
+                                    <th style="width: 8%">Assigned</th>
+                                    <th style="width: 10%">Actions</th>
+                                 </thead>
+                                <tbody>
+                                    @foreach (var job in Model)
+                                    {
+                                        var canManageJob = User.IsInRole("Admin")
+                                            || (User.IsInRole("Contractor") && currentUserId.HasValue && job.CreatedByUserId == currentUserId);
+                                        <tr data-job-id="@job.Id">
+                                            <td class="fw-semibold">
+                                                <a asp-action="Details" asp-route-id="@job.Id" class="text-decoration-none text-dark">
+                                                    @job.Title
+                                                </a>
+                                              </td>
+                                            <td class="text-truncate" style="max-width: 150px;" title="@job.ClientName">@(job.ClientName ?? "â€”")</td>
+                                            <td class="text-truncate" style="max-width: 180px;" title="@job.Address">@(job.Address ?? "â€”")</td>
+                                            <td>
+                                                @(job.ScheduledDate.HasValue
+                                                    ? job.ScheduledDate.Value.ToString("MMM dd, yyyy")
+                                                    : "â€”")
+                                            </td>
+                                            <td>
+                                                @if (job.Status == JobStatus.Active)
+                                                {
+                                                    <span class="badge bg-primary px-3 py-1">Active</span>
+                                                }
+                                                else if (job.Status == JobStatus.PendingConfirmation)
+                                                {
+                                                    <span class="badge bg-warning text-dark px-3 py-1">Pending</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-success px-3 py-1">Completed</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-secondary" id="assignedCount-@job.Id">
+                                                    <i class="fas fa-users me-1"></i>Loading...
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="dropdown">
+                                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" 
+                                                            type="button" 
+                                                            data-bs-toggle="dropdown" 
+                                                            aria-expanded="false">
+                                                        <i class="fas fa-cog me-1"></i>Actions
+                                                    </button>
+                                                    <ul class="dropdown-menu shadow-sm">
+                                                        <!-- View Details -->
+                                                        <li>
+                                                            <a asp-action="Details" asp-route-id="@job.Id" class="dropdown-item">
+                                                                <i class="fas fa-eye text-primary me-2"></i>View Details
+                                                            </a>
+                                                        </li>
+
+                                                        <!-- Assign Workers -->
+                                                        @if (canManageJob)
+                                                        {
+                                                            <li>
+                                                                <button type="button" 
+                                                                        class="dropdown-item" 
+                                                                        onclick="loadAssignModal('@job.Id', '@job.Title.Replace("'", "\\'")')">
+                                                                    <i class="fas fa-user-plus text-success me-2"></i>Assign Workers
+                                                                </button>
+                                                            </li>
+                                                        }
+
+                                                        <!-- Edit Job -->
+                                                        @if (canManageJob && job.Status != JobStatus.Completed)
+                                                        {
+                                                            <li>
+                                                                <a asp-action="Edit" asp-route-id="@job.Id" class="dropdown-item">
+                                                                    <i class="fas fa-edit text-warning me-2"></i>Edit Job
+                                                                </a>
+                                                            </li>
+                                                        }
+
+                                                        <!-- Mark Complete -->
+                                                        @if (canManageJob && job.Status == JobStatus.Active)
+                                                        {
+                                                            <li>
+                                                                <form asp-action="MarkComplete" asp-route-id="@job.Id" method="post">
+                                                                    @Html.AntiForgeryToken()
+                                                                    <button type="submit" class="dropdown-item" 
+                                                                            onclick="return confirm('Mark this job as complete?')">
+                                                                        <i class="fas fa-check text-info me-2"></i>Mark Complete
+                                                                    </button>
+                                                                </form>
+                                                            </li>
+                                                        }
+
+                                                        <!-- Confirm Complete (Admin only) -->
+                                                        @if (User.IsInRole("Admin") && job.Status == JobStatus.PendingConfirmation)
+                                                        {
+                                                            <li>
+                                                                <form asp-action="ConfirmComplete" asp-route-id="@job.Id" method="post">
+                                                                    @Html.AntiForgeryToken()
+                                                                    <button type="submit" class="dropdown-item" 
+                                                                            onclick="return confirm('Confirm this job is complete?')">
+                                                                        <i class="fas fa-check-double text-success me-2"></i>Confirm Complete
+                                                                    </button>
+                                                                </form>
+                                                            </li>
+                                                        }
+
+                                                        <!-- Divider before delete -->
+                                                        @if (User.IsInRole("Admin"))
+                                                        {
+                                                            <li><hr class="dropdown-divider"></li>
+                                                            <li>
+                                                                <a asp-action="Delete" asp-route-id="@job.Id" class="dropdown-item text-danger">
+                                                                    <i class="fas fa-trash me-2"></i>Delete Job
+                                                                </a>
+                                                            </li>
+                                                        }
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                             </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        <!-- Mobile Card View -->
+        <div class="d-block d-md-none">
+            <div class="row g-3">
+                @foreach (var job in Model)
+                {
+                    var canManageJob = User.IsInRole("Admin")
+                        || (User.IsInRole("Contractor") && currentUserId.HasValue && job.CreatedByUserId == currentUserId);
+                    <div class="col-12" data-job-id="@job.Id">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="card-title mb-0 fw-semibold">@job.Title</h5>
+                                    @if (job.Status == JobStatus.Active)
+                                    {
+                                        <span class="badge bg-primary">Active</span>
+                                    }
+                                    else if (job.Status == JobStatus.PendingConfirmation)
+                                    {
+                                        <span class="badge bg-warning text-dark">Pending</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success">Completed</span>
+                                    }
+                                </div>
+                                
+                                <div class="small text-muted mb-2">
+                                    <div><i class="fas fa-user-tie me-1"></i> @(job.ClientName ?? "No client")</div>
+                                    <div><i class="fas fa-map-marker-alt me-1"></i> @(job.Address ?? "No address")</div>
+                                    <div><i class="fas fa-calendar-alt me-1"></i> 
+                                        @(job.ScheduledDate.HasValue
+                                            ? job.ScheduledDate.Value.ToString("MMM dd, yyyy")
+                                            : "Not scheduled")
+                                    </div>
+                                    <div><i class="fas fa-users me-1"></i> <span id="assignedCountMobile-@job.Id">Loading...</span> assigned</div>
+                                </div>
+                                
+                                <div class="d-flex gap-1 flex-wrap mt-3">
+                                    <a asp-action="Details" asp-route-id="@job.Id"
+                                       class="btn btn-sm btn-outline-secondary">
+                                        <i class="fas fa-eye"></i> Details
+                                    </a>
+
+                                    @if (canManageJob)
+                                    {
+                                        <button type="button" 
+                                                class="btn btn-sm btn-outline-success" 
+                                                onclick="loadAssignModal('@job.Id', '@job.Title.Replace("'", "\\'")')"
+                                                title="Assign Employees">
+                                            <i class="fas fa-user-plus"></i> Assign
+                                        </button>
+                                    }
+
+                                    @if (canManageJob && job.Status != JobStatus.Completed)
+                                    {
+                                        <a asp-action="Edit" asp-route-id="@job.Id"
+                                           class="btn btn-sm btn-outline-warning">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                    }
+
+                                    @if (canManageJob && job.Status == JobStatus.Active)
+                                    {
+                                        <form asp-action="MarkComplete" asp-route-id="@job.Id"
+                                              method="post" class="d-inline"
+                                              onsubmit="return confirm('Mark this job as complete?')">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-sm btn-outline-info">
+                                                <i class="fas fa-check"></i> Complete
+                                            </button>
+                                        </form>
+                                    }
+
+                                    @if (User.IsInRole("Admin") && job.Status == JobStatus.PendingConfirmation)
+                                    {
+                                        <form asp-action="ConfirmComplete" asp-route-id="@job.Id"
+                                              method="post" class="d-inline"
+                                              onsubmit="return confirm('Confirm this job is complete?')">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-sm btn-success">
+                                                <i class="fas fa-check-double"></i> Confirm
+                                            </button>
+                                        </form>
+                                    }
+
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <a asp-action="Delete" asp-route-id="@job.Id"
+                                           class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Assign Employees Modal -->
+<div class="modal fade" id="assignModal" tabindex="-1" aria-labelledby="assignModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="assignModalLabel">
+                    <i class="fas fa-user-plus me-2"></i>Assign Employees
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="assignModalBody">
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Loading employees...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Load assigned employee counts for all jobs
+        async function loadAssignedCounts() {
+            const jobElements = document.querySelectorAll('[data-job-id]');
+            const jobIds = Array.from(jobElements).map(el => el.getAttribute('data-job-id'));
+
+            for (const jobId of jobIds) {
+                try {
+                    const response = await fetch(`/Job/GetAssignedCount?jobId=${jobId}`);
+                    const data = await response.json();
+
+                    const countElement = document.getElementById(`assignedCount-${jobId}`);
+                    const countMobileElement = document.getElementById(`assignedCountMobile-${jobId}`);
+
+                    if (countElement) {
+                        countElement.innerHTML = `<i class="fas fa-users me-1"></i>${data.count} employee${data.count !== 1 ? 's' : ''}`;
+                    }
+                    if (countMobileElement) {
+                        countMobileElement.textContent = `${data.count} employee${data.count !== 1 ? 's' : ''}`;
+                    }
+                } catch (error) {
+                    console.error('Error loading assigned count for job', jobId, error);
+                    const countElement = document.getElementById(`assignedCount-${jobId}`);
+                    if (countElement) {
+                        countElement.innerHTML = `<i class="fas fa-users me-1"></i>0 employees`;
+                    }
+                }
+            }
+        }
+
+        // Load assign modal content
+        function loadAssignModal(jobId, jobTitle) {
+            const modal = new bootstrap.Modal(document.getElementById('assignModal'));
+            document.getElementById('assignModalLabel').innerHTML = 
+                `<i class="fas fa-user-plus me-2"></i>Assign Employees to: ${jobTitle}`;
+            
+            fetch(`/Job/GetAssignModalContent?jobId=${jobId}`)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('assignModalBody').innerHTML = html;
+                    modal.show();
+                    
+                    // Reload assigned counts after modal closes
+                    document.getElementById('assignModal').addEventListener('hidden.bs.modal', function () {
+                        loadAssignedCounts();
+                    }, { once: true });
+                })
+                .catch(error => {
+                    console.error('Error loading modal content:', error);
+                    document.getElementById('assignModalBody').innerHTML = 
+                        `<div class="alert alert-danger">Error loading employees. Please try again.</div>
+                         <div class="text-center mt-3">
+                             <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                             <button class="btn btn-primary" onclick="loadAssignModal('${jobId}', '${jobTitle}')">Retry</button>
+                         </div>`;
+                    modal.show();
+                });
+        }
+        
+        // Load assigned counts when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAssignedCounts();
+        });
+    </script>
+}

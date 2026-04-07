@@ -1,0 +1,207 @@
+﻿@model Thekdar.Models.JobModel
+@using Thekdar.Models
+@using System.Security.Claims
+
+@{
+    ViewData["Title"] = "Job Details";
+    var assignments = ViewBag.JobAssignments as List<JobAssignmentModel> ?? new List<JobAssignmentModel>();
+    int? currentUserId = null;
+    if (int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var uid))
+    {
+        currentUserId = uid;
+    }
+
+    var canManageThisJob = User.IsInRole("Admin")
+        || (User.IsInRole("Contractor") && currentUserId.HasValue && Model.CreatedByUserId == currentUserId);
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-9">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0"><i class="fas fa-briefcase me-2"></i>Job Details</h4>
+                    @if (Model.Status == JobStatus.Active)
+                    {
+                        <span class="badge bg-primary">Active</span>
+                    }
+                    else if (Model.Status == JobStatus.PendingConfirmation)
+                    {
+                        <span class="badge bg-warning text-dark">Pending Confirmation</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-success">Completed</span>
+                    }
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered mb-4">
+                        <tr>
+                            <th class="bg-light" style="width:35%">Title</th>
+                            <td class="fw-semibold">@Model.Title</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Description</th>
+                            <td>@(string.IsNullOrWhiteSpace(Model.Description) ? "-" : Model.Description)</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Client</th>
+                            <td>@(Model.ClientName ?? "-")</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Address</th>
+                            <td>@(Model.Address ?? "-")</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Scheduled</th>
+                            <td>@(Model.ScheduledDate?.ToString("MMM dd, yyyy") ?? "-")</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Created</th>
+                            <td>@Model.CreatedAt.ToString("MMM dd, yyyy")</td>
+                        </tr>
+                    </table>
+
+                    <div class="mb-4">
+                        <h5 class="fw-semibold mb-3">
+                            <i class="fas fa-users text-primary me-2"></i>Assigned Workers
+                            @if (assignments.Any())
+                            {
+                                <span class="badge bg-secondary ms-2">@assignments.Count</span>
+                            }
+                        </h5>
+
+                        @if (!assignments.Any())
+                        {
+                            <div class="alert alert-light text-center py-4">
+                                <p class="mb-0 text-muted">No workers assigned to this job yet.</p>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Trade</th>
+                                            <th>Role</th>
+                                            <th>Assigned By</th>
+                                            <th>Assigned At</th>
+                                            @if (User.IsInRole("Admin"))
+                                            {
+                                                <th>Actions</th>
+                                            }
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var assignment in assignments.Where(a => a.Employee != null))
+                                        {
+                                            <tr>
+                                                <td class="fw-semibold">@assignment.Employee!.FullName</td>
+                                                <td>@assignment.Employee.Trade</td>
+                                                <td><span class="badge bg-info">@assignment.Role</span></td>
+                                                <td>@(assignment.AssignedByUser?.Name ?? "Unknown")</td>
+                                                <td>@assignment.AssignedAt.ToLocalTime().ToString("MMM dd, yyyy h:mm tt")</td>
+                                                @if (User.IsInRole("Admin"))
+                                                {
+                                                    <td>
+                                                        <form asp-action="UnassignEmployee" asp-route-jobId="@Model.Id" asp-route-employeeId="@assignment.EmployeeId" method="post">
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Remove @assignment.Employee.FullName from this job?');">Unassign</button>
+                                                        </form>
+                                                    </td>
+                                                }
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+
+                        @if (canManageThisJob && Model.Status != JobStatus.Completed)
+                        {
+                            <div class="mt-3 d-flex gap-2 justify-content-end">
+                                @if (User.IsInRole("Admin") && assignments.Any())
+                                {
+                                    <form asp-action="UnassignAllEmployees" asp-route-jobId="@Model.Id" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-warning btn-sm" onclick="return confirm('Unassign all workers from this job?');">Unassign All</button>
+                                    </form>
+                                }
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="loadAssignModal('@Model.Id', '@Model.Title.Replace("'", "\\'")')">
+                                    Edit Assignment
+                                </button>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="d-flex gap-2 flex-wrap">
+                        @if (canManageThisJob && Model.Status != JobStatus.Completed)
+                        {
+                            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit Job</a>
+                        }
+
+                        @if (canManageThisJob && Model.Status == JobStatus.Active)
+                        {
+                            <form asp-action="MarkComplete" asp-route-id="@Model.Id" method="post" class="d-inline" onsubmit="return confirm('Mark this job as complete?')">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-info text-white">Mark Complete</button>
+                            </form>
+                        }
+
+                        @if (User.IsInRole("Admin") && Model.Status == JobStatus.PendingConfirmation)
+                        {
+                            <form asp-action="ConfirmComplete" asp-route-id="@Model.Id" method="post" class="d-inline" onsubmit="return confirm('Confirm this job is complete?')">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-success">Confirm Complete</button>
+                            </form>
+                        }
+
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">Delete</a>
+                        }
+
+                        <a asp-action="Index" class="btn btn-outline-secondary">Back to Jobs</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="assignModal" tabindex="-1" aria-labelledby="assignModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="assignModalLabel">Assign Employees</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="assignModalBody">
+                <div class="text-center py-4">Loading employees...</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function loadAssignModal(jobId, jobTitle) {
+            const modal = new bootstrap.Modal(document.getElementById('assignModal'));
+            document.getElementById('assignModalLabel').innerHTML = `Assign Employees to: ${jobTitle}`;
+
+            fetch(`/Job/GetAssignModalContent?jobId=${jobId}`)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('assignModalBody').innerHTML = html;
+                    modal.show();
+                })
+                .catch(() => {
+                    document.getElementById('assignModalBody').innerHTML = '<div class="alert alert-danger">Error loading employees. Please try again.</div>';
+                    modal.show();
+                });
+        }
+    </script>
+}
+

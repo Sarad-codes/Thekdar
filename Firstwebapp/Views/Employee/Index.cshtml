@@ -1,0 +1,320 @@
+﻿@model IEnumerable<EmployeeViewModel>
+@using Thekdar.Models
+@using System.Security.Claims
+
+@{
+    ViewData["Title"] = "Workers";
+    var currentFilter = ViewBag.CurrentFilter ?? "Active";
+    var workerCount = Model.Count();
+    int? currentUserId = null;
+    if (int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var uid))
+        currentUserId = uid;
+}
+
+<div class="container mt-4">
+    <div class="worker-page-header mb-4">
+        <div>
+            <span class="worker-page-kicker">Workforce</span>
+            <h2 class="mb-1">
+                <i class="fas fa-users me-2 text-primary"></i>Workers
+            </h2>
+            <p class="text-muted mb-0">Manage active and deactivated employees from one place.</p>
+        </div>
+        @if (User.IsInRole("Admin") || User.IsInRole("Contractor"))
+        {
+            <a asp-action="Create" class="btn btn-primary add-employee-btn">
+                <i class="fas fa-plus me-2"></i>Add Employee
+            </a>
+        }
+    </div>
+
+    <div class="worker-toolbar mb-4">
+        <div class="worker-filters" role="group" aria-label="Worker filters">
+            <a asp-action="Index" asp-route-filter="Active"
+               class="btn worker-filter-btn btn-outline-success @(currentFilter == "Active" ? "active" : "")">
+                <i class="fas fa-check-circle me-1"></i>Active
+            </a>
+            <a asp-action="Index" asp-route-filter="All"
+               class="btn worker-filter-btn btn-outline-primary @(currentFilter == "All" ? "active" : "")">
+                <i class="fas fa-list me-1"></i>All
+            </a>
+            <a asp-action="Index" asp-route-filter="Deleted"
+               class="btn worker-filter-btn btn-outline-secondary @(currentFilter == "Deleted" ? "active" : "")">
+                <i class="fas fa-trash me-1"></i>Deactivated
+            </a>
+        </div>
+        <span class="worker-count-badge">
+            <i class="fas fa-users me-1"></i> @workerCount worker@(workerCount != 1 ? "s" : "")
+        </span>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5 text-muted">
+            @if (currentFilter == "Deleted")
+            {
+                <i class="fas fa-user-check fa-4x mb-3"></i>
+                <p class="fs-5">No deactivated workers found.</p>
+                <a asp-action="Index" asp-route-filter="Active" class="btn btn-primary mt-2">
+                    <i class="fas fa-arrow-left me-2"></i>View Active Workers
+                </a>
+            }
+            else
+            {
+                <i class="fas fa-user-slash fa-4x mb-3"></i>
+                <p class="fs-5">No workers yet.</p>
+                <a asp-action="Create" class="btn btn-primary mt-2">
+                    <i class="fas fa-plus me-2"></i>Add First Worker
+                </a>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover align-middle worker-table">
+                <thead class="table-dark">
+                    <tr>
+                        <th class="text-nowrap" style="width: 6%">Photo</th>
+                        <th class="text-nowrap" style="width: 16%">Name</th>
+                        <th class="text-nowrap" style="width: 12%">Contractor</th>
+                        <th class="text-nowrap" style="width: 10%">Trade</th>
+                        <th class="text-nowrap" style="width: 11%">Primary Phone</th>
+                        <th class="text-nowrap" style="width: 11%">Secondary Phone</th>
+                        <th class="text-nowrap" style="width: 14%">Email</th>
+                        <th class="text-nowrap" style="width: 8%">Daily Rate</th>
+                        <th class="text-nowrap" style="width: 6%">Status</th>
+                        <th class="text-nowrap" style="width: 6%">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var emp in Model)
+                    {
+                        var canManageWorker = User.IsInRole("Admin")
+                            || (User.IsInRole("Contractor") && emp.ContractorId == currentUserId);
+                        var isDeletedRow = emp.IsDeleted;
+                        var primaryAction = isDeletedRow && canManageWorker ? "Edit" : "Details";
+                        var primaryActionLabel = isDeletedRow && canManageWorker ? "Edit Worker" : "View Details";
+                        var primaryActionIcon = isDeletedRow && canManageWorker ? "fa-edit text-warning" : "fa-eye text-primary";
+
+                        <tr class="@(isDeletedRow ? "table-secondary opacity-75" : "")">
+                            <td class="text-center">
+                                @if (!string.IsNullOrEmpty(emp.ExistingProfilePicturePath))
+                                {
+                                    <img src="@emp.ExistingProfilePicturePath"
+                                         alt="@emp.FullName"
+                                         class="rounded-circle"
+                                         style="width: 40px; height: 40px; object-fit: cover; cursor: pointer;"
+                                         onclick="openImageModal('@emp.ExistingProfilePicturePath')" />
+                                }
+                                else
+                                {
+                                    <i class="fas fa-user-circle fa-2x text-secondary" style="cursor: pointer;"
+                                       onclick="openImageModal(null)"></i>
+                                }
+                            </td>
+                            <td class="fw-semibold">
+                                <a asp-action="@primaryAction" asp-route-id="@emp.Id" class="text-decoration-none text-dark">
+                                    @emp.FullName
+                                </a>
+                                @if (isDeletedRow)
+                                {
+                                    <span class="badge bg-secondary ms-2">Deactivated</span>
+                                }
+                            </td>
+                            <td class="small text-muted">@(emp.ContractorName ?? "-")</td>
+                            <td><span class="badge bg-info">@emp.Trade</span></td>
+                            <td class="text-nowrap">@emp.Phone</td>
+                            <td class="text-nowrap">@(string.IsNullOrEmpty(emp.Phone2) ? "-" : emp.Phone2)</td>
+                            <td class="text-nowrap">@(string.IsNullOrEmpty(emp.Email) ? "-" : emp.Email)</td>
+                            <td class="fw-semibold text-success text-nowrap">NPR @emp.DailyRate.ToString("N0")</td>
+                            <td>
+                                @if (emp.IsAvailable)
+                                {
+                                    <span class="badge bg-success">Available</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Unavailable</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                            type="button"
+                                            data-bs-toggle="dropdown"
+                                            aria-expanded="false">
+                                        <i class="fas fa-cog me-1"></i>Actions
+                                    </button>
+                                    <ul class="dropdown-menu shadow-sm">
+                                        <li>
+                                            <a asp-action="@primaryAction" asp-route-id="@emp.Id" class="dropdown-item">
+                                                <i class="fas @primaryActionIcon me-2"></i>@primaryActionLabel
+                                            </a>
+                                        </li>
+
+                                        @if (canManageWorker && !isDeletedRow)
+                                        {
+                                            <li>
+                                                <a asp-action="Edit" asp-route-id="@emp.Id" class="dropdown-item">
+                                                    <i class="fas fa-edit text-warning me-2"></i>Edit Worker
+                                                </a>
+                                            </li>
+                                        }
+
+                                        @if (User.IsInRole("Admin"))
+                                        {
+                                            <li><hr class="dropdown-divider"></li>
+
+                                            @if (isDeletedRow)
+                                            {
+                                                <li>
+                                                    <form asp-action="Reactivate" asp-route-id="@emp.Id" method="post">
+                                                        @Html.AntiForgeryToken()
+                                                        <button type="submit" class="dropdown-item text-success"
+                                                                onclick="return confirm('Reactivate this worker? They will be available for assignments again.')">
+                                                            <i class="fas fa-undo-alt me-2"></i>Reactivate Worker
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                            }
+                                            else
+                                            {
+                                                <li>
+                                                    <a asp-action="Delete" asp-route-id="@emp.Id" class="dropdown-item text-danger">
+                                                        <i class="fas fa-trash me-2"></i>Deactivate Worker
+                                                    </a>
+                                                </li>
+                                            }
+                                        }
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+<style>
+    .worker-page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .worker-page-kicker {
+        display: inline-block;
+        margin-bottom: 0.35rem;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #6c757d;
+    }
+
+    .add-employee-btn {
+        min-width: 180px;
+        align-self: center;
+        box-shadow: 0 0.5rem 1rem rgba(13, 110, 253, 0.18);
+    }
+
+    .worker-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+        padding: 1rem 1.25rem;
+        border: 1px solid rgba(108, 117, 125, 0.18);
+        border-radius: 1rem;
+        background: linear-gradient(135deg, rgba(248, 249, 250, 0.98), rgba(255, 255, 255, 1));
+    }
+
+    .worker-filters {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .worker-filter-btn {
+        min-width: 130px;
+    }
+
+    .worker-count-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.7rem 1rem;
+        border-radius: 999px;
+        background-color: #f8f9fa;
+        color: #212529;
+        font-weight: 600;
+        border: 1px solid rgba(108, 117, 125, 0.2);
+    }
+
+    .worker-table {
+        min-width: 1180px;
+    }
+
+    .worker-table thead th {
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+
+    .worker-table td {
+        vertical-align: middle;
+    }
+
+    @@media (max-width: 767.98px) {
+        .worker-page-header,
+        .worker-toolbar {
+            align-items: stretch;
+        }
+
+        .add-employee-btn,
+        .worker-filter-btn,
+        .worker-count-badge {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .worker-filters {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-image me-2"></i>Employee Photo
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" alt="Employee Photo" class="img-fluid" style="max-height: 70vh;" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function openImageModal(imageSrc) {
+            if (imageSrc) {
+                document.getElementById('modalImage').src = imageSrc;
+                new bootstrap.Modal(document.getElementById('imageModal')).show();
+            }
+        }
+    </script>
+}
+

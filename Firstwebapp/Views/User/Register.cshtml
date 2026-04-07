@@ -1,0 +1,236 @@
+﻿@model Thekdar.ViewModels.RegisterViewModel
+@using Thekdar.Models
+
+@{
+    ViewData["Title"] = "Add Contractor";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-user-plus me-2"></i>Add New Contractor</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-controller="User" asp-action="Register" method="post" enctype="multipart/form-data">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label fw-semibold">
+                                <i class="fas fa-user me-1 text-muted"></i>Full Name
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                <input asp-for="Name" class="form-control" placeholder="Full name" />
+                            </div>
+                            <span asp-validation-for="Name" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label fw-semibold">
+                                <i class="fas fa-envelope me-1 text-muted"></i>Email Address
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                <input asp-for="Email" class="form-control" placeholder="name@example.com" />
+                            </div>
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Phone" class="form-label fw-semibold">
+                                <i class="fas fa-phone me-1 text-muted"></i>Phone Number
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                <input asp-for="Phone" class="form-control" id="phoneInput" placeholder="10-digit number" />
+                            </div>
+                            <span asp-validation-for="Phone" class="text-danger small" id="phoneError"></span>
+                            <small class="text-muted" id="phoneHint">Must be exactly 10 digits</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Age" class="form-label fw-semibold">
+                                <i class="fas fa-calendar-alt me-1 text-muted"></i>Age
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                                <input asp-for="Age" class="form-control" type="number" min="18" max="100" placeholder="18-100" />
+                            </div>
+                            <span asp-validation-for="Age" class="text-danger small"></span>
+                            <small class="text-muted">Must be between 18 and 100 years</small>
+                        </div>
+
+                        <!-- Profile Picture -->
+                        <div class="mb-3">
+                            <label for="ProfilePicture" class="form-label fw-semibold">
+                                <i class="fas fa-camera me-1 text-muted"></i>Profile Picture
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-image"></i></span>
+                                <input type="file" name="ProfilePicture" class="form-control" accept="image/*" />
+                            </div>
+                            <small class="text-muted">Optional: Upload a profile picture (JPEG, PNG, GIF, WEBP, max 5MB)</small>
+                            <div id="imagePreviewContainer" class="mt-2 text-center" style="display: none;">
+                                <img id="imagePreview" src="#" alt="Preview" class="rounded-circle" style="width: 80px; height: 80px; object-fit: cover; border: 2px solid #3b82f6;" />
+                            </div>
+                        </div>
+
+                        <!-- Hidden role â€” always Contractor -->
+                        <input type="hidden" asp-for="Role" value="@UserRole.Contractor" />
+                        <div class="mb-3 alert alert-info">
+                            <i class="fas fa-hard-hat me-2"></i>
+                            This user will be added as a <strong>Contractor</strong> with full job management capabilities.
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Password" class="form-label fw-semibold">
+                                <i class="fas fa-lock me-1 text-muted"></i>Password
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                <input asp-for="Password" class="form-control" type="password" id="passwordInput" placeholder="Set a password" />
+                                <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('passwordInput', this)" title="Show/Hide password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <span asp-validation-for="Password" class="text-danger small"></span>
+                            <small class="text-muted">Password must be at least 6 characters</small>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="ConfirmPassword" class="form-label fw-semibold">
+                                <i class="fas fa-check-double me-1 text-muted"></i>Confirm Password
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                <input asp-for="ConfirmPassword" class="form-control" type="password" id="confirmPasswordInput" placeholder="Repeat password" />
+                                <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('confirmPasswordInput', this)" title="Show/Hide password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary flex-fill"
+                                    onclick="return confirm('Add this contractor?')">
+                                <i class="fas fa-user-plus me-2"></i>Add Contractor
+                            </button>
+                            <a asp-action="List" class="btn btn-outline-secondary flex-fill">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Phone number validation (real-time)
+        function validatePhone(input) {
+            let value = input.value.replace(/\D/g, '');
+            if (value.length > 10) value = value.slice(0, 10);
+            input.value = value;
+            
+            const errorSpan = document.getElementById('phoneError');
+            const hintSpan = document.getElementById('phoneHint');
+            
+            if (value.length === 10) {
+                errorSpan.textContent = '';
+                hintSpan.style.color = '#198754';
+                hintSpan.innerHTML = 'âœ“ Valid phone number';
+                input.classList.add('is-valid');
+                input.classList.remove('is-invalid');
+                return true;
+            } else if (value.length > 0) {
+                errorSpan.textContent = 'Phone must be exactly 10 digits';
+                hintSpan.style.color = '#dc3545';
+                hintSpan.innerHTML = 'âœ— Must be exactly 10 digits (0-9)';
+                input.classList.add('is-invalid');
+                input.classList.remove('is-valid');
+                return false;
+            } else {
+                errorSpan.textContent = '';
+                hintSpan.style.color = '#6c757d';
+                hintSpan.innerHTML = 'Must be exactly 10 digits';
+                input.classList.remove('is-valid', 'is-invalid');
+                return false;
+            }
+        }
+        
+        // Password visibility toggle
+        function togglePassword(inputId, button) {
+            const input = document.getElementById(inputId);
+            const icon = button.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+        
+        // Image preview
+        const fileInput = document.querySelector('input[name="ProfilePicture"]');
+        const previewContainer = document.getElementById('imagePreviewContainer');
+        const previewImage = document.getElementById('imagePreview');
+        
+        if (fileInput) {
+            fileInput.addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewImage.src = e.target.result;
+                        previewContainer.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    previewContainer.style.display = 'none';
+                    previewImage.src = '#';
+                }
+            });
+        }
+        
+        // Attach phone validation
+        const phoneInput = document.getElementById('phoneInput');
+        if (phoneInput) {
+            phoneInput.addEventListener('input', function() { validatePhone(this); });
+            validatePhone(phoneInput);
+        }
+        
+        // Password match validation (real-time)
+        const passwordInput = document.getElementById('passwordInput');
+        const confirmInput = document.getElementById('confirmPasswordInput');
+        
+        function validatePasswordMatch() {
+            if (confirmInput.value.length > 0) {
+                if (passwordInput.value !== confirmInput.value) {
+                    confirmInput.setCustomValidity('Passwords do not match');
+                    confirmInput.classList.add('is-invalid');
+                } else {
+                    confirmInput.setCustomValidity('');
+                    confirmInput.classList.remove('is-invalid');
+                    confirmInput.classList.add('is-valid');
+                }
+            } else {
+                confirmInput.classList.remove('is-valid', 'is-invalid');
+            }
+        }
+        
+        if (passwordInput && confirmInput) {
+            passwordInput.addEventListener('input', validatePasswordMatch);
+            confirmInput.addEventListener('input', validatePasswordMatch);
+        }
+    </script>
+}

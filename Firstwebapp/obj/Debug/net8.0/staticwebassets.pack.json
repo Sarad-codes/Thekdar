@@ -1,0 +1,349 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\Thekdar.bundle.scp.css",
+      "PackagePath": "staticwebassets\\Thekdar.bundle.scp.css"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\css\\RegisterSuccess.css",
+      "PackagePath": "staticwebassets\\css\\RegisterSuccess.css"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\css\\site.css",
+      "PackagePath": "staticwebassets\\css\\site.css"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\favicon.ico",
+      "PackagePath": "staticwebassets\\favicon.ico"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\img\\subtle.jpg",
+      "PackagePath": "staticwebassets\\img\\subtle.jpg"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\js\\reports.js",
+      "PackagePath": "staticwebassets\\js\\reports.js"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\js\\site.js",
+      "PackagePath": "staticwebassets\\js\\site.js"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\LICENSE",
+      "PackagePath": "staticwebassets\\lib\\bootstrap"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.css"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.css.map"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.min.css"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.css"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.css.map"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.min.css"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.css"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.css.map"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.min.css"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.css"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.css.map"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.min.css"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.css"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.css.map"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.min.css"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.css"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.css.map"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.min.css"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.css"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.css.map"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.min.css"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.css"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.css.map"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.min.css"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.js",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.js"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.js.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.js.map"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.min.js",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.min.js"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.min.js.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.min.js.map"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.esm.js",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.esm.js"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.esm.js.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.esm.js.map"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.esm.min.js",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.esm.min.js"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.esm.min.js.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.esm.min.js.map"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.js",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.js"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.js.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.js.map"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.min.js",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.min.js"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.min.js.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.min.js.map"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\fontawesome\\all.min.css",
+      "PackagePath": "staticwebassets\\lib\\fontawesome\\all.min.css"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\fontawesome\\all.min.js",
+      "PackagePath": "staticwebassets\\lib\\fontawesome\\all.min.js"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\jquery-validation-unobtrusive\\LICENSE.txt",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation-unobtrusive\\LICENSE.txt"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\jquery-validation-unobtrusive\\jquery.validate.unobtrusive.js",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation-unobtrusive\\jquery.validate.unobtrusive.js"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\jquery-validation-unobtrusive\\jquery.validate.unobtrusive.min.js",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation-unobtrusive\\jquery.validate.unobtrusive.min.js"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\jquery-validation\\LICENSE.md",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation\\LICENSE.md"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\jquery-validation\\dist\\additional-methods.js",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation\\dist\\additional-methods.js"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\jquery-validation\\dist\\additional-methods.min.js",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation\\dist\\additional-methods.min.js"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\jquery-validation\\dist\\jquery.validate.js",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation\\dist\\jquery.validate.js"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\jquery-validation\\dist\\jquery.validate.min.js",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation\\dist\\jquery.validate.min.js"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\jquery\\LICENSE.txt",
+      "PackagePath": "staticwebassets\\lib\\jquery\\LICENSE.txt"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\jquery\\dist\\jquery.js",
+      "PackagePath": "staticwebassets\\lib\\jquery\\dist\\jquery.js"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\jquery\\dist\\jquery.min.js",
+      "PackagePath": "staticwebassets\\lib\\jquery\\dist\\jquery.min.js"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\lib\\jquery\\dist\\jquery.min.map",
+      "PackagePath": "staticwebassets\\lib\\jquery\\dist\\jquery.min.map"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\uploads\\employees\\128485a0-55a3-42c0-abca-ad0d6fe622a8\\pan\\1337b545-5179-4335-a3b6-628cb5dfbd48_IMG_20260217_205821.jpg",
+      "PackagePath": "staticwebassets\\uploads\\employees\\128485a0-55a3-42c0-abca-ad0d6fe622a8\\pan\\1337b545-5179-4335-a3b6-628cb5dfbd48_IMG_20260217_205821.jpg"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\uploads\\employees\\128485a0-55a3-42c0-abca-ad0d6fe622a8\\pan\\8b23558c-f4fc-4095-973c-7e3fe7d283c7_IMG_20260216_211857.jpg",
+      "PackagePath": "staticwebassets\\uploads\\employees\\128485a0-55a3-42c0-abca-ad0d6fe622a8\\pan\\8b23558c-f4fc-4095-973c-7e3fe7d283c7_IMG_20260216_211857.jpg"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\uploads\\employees\\128485a0-55a3-42c0-abca-ad0d6fe622a8\\profile\\17700f7c-a631-481b-9833-76473d522a11_Screenshot (97).png",
+      "PackagePath": "staticwebassets\\uploads\\employees\\128485a0-55a3-42c0-abca-ad0d6fe622a8\\profile\\17700f7c-a631-481b-9833-76473d522a11_Screenshot (97).png"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\uploads\\employees\\128485a0-55a3-42c0-abca-ad0d6fe622a8\\profile\\277a0e1c-9a46-41a1-abd3-cdfc824a7583_IMG_20260217_205821.jpg",
+      "PackagePath": "staticwebassets\\uploads\\employees\\128485a0-55a3-42c0-abca-ad0d6fe622a8\\profile\\277a0e1c-9a46-41a1-abd3-cdfc824a7583_IMG_20260217_205821.jpg"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\uploads\\employees\\128485a0-55a3-42c0-abca-ad0d6fe622a8\\profile\\63d1ed38-3ec8-41bd-a36e-38aa8a48b683_IMG_20260216_211857.jpg",
+      "PackagePath": "staticwebassets\\uploads\\employees\\128485a0-55a3-42c0-abca-ad0d6fe622a8\\profile\\63d1ed38-3ec8-41bd-a36e-38aa8a48b683_IMG_20260216_211857.jpg"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\uploads\\employees\\128485a0-55a3-42c0-abca-ad0d6fe622a8\\profile\\b3668084-3345-4fde-ae7a-b0a8314958ed_IMG_20260216_211857.jpg",
+      "PackagePath": "staticwebassets\\uploads\\employees\\128485a0-55a3-42c0-abca-ad0d6fe622a8\\profile\\b3668084-3345-4fde-ae7a-b0a8314958ed_IMG_20260216_211857.jpg"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\uploads\\employees\\14c4dd23-e9d5-407c-8b42-51841d612159\\profile\\296dddd2-6019-4d2a-b284-96b4e9d3baa3_WIN_20260321_09_52_57_Pro.jpg",
+      "PackagePath": "staticwebassets\\uploads\\employees\\14c4dd23-e9d5-407c-8b42-51841d612159\\profile\\296dddd2-6019-4d2a-b284-96b4e9d3baa3_WIN_20260321_09_52_57_Pro.jpg"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\uploads\\employees\\2e0023a3-d1b1-49e1-bc9b-ddf8c8e5cb32\\profile\\30b32bf5-44ca-4f88-a020-2919913f1283_Kisne.jpg",
+      "PackagePath": "staticwebassets\\uploads\\employees\\2e0023a3-d1b1-49e1-bc9b-ddf8c8e5cb32\\profile\\30b32bf5-44ca-4f88-a020-2919913f1283_Kisne.jpg"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\uploads\\employees\\2e0023a3-d1b1-49e1-bc9b-ddf8c8e5cb32\\profile\\dd4c4c25-0278-4358-bd6d-3a870158cd3a_Sagar.jpg",
+      "PackagePath": "staticwebassets\\uploads\\employees\\2e0023a3-d1b1-49e1-bc9b-ddf8c8e5cb32\\profile\\dd4c4c25-0278-4358-bd6d-3a870158cd3a_Sagar.jpg"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\uploads\\employees\\3ed1c88e-e3d0-4ca4-9699-3055f408c92d\\profile\\71f7007c-1f32-4ed0-a04b-3b482225ef85_PersonIcon.png",
+      "PackagePath": "staticwebassets\\uploads\\employees\\3ed1c88e-e3d0-4ca4-9699-3055f408c92d\\profile\\71f7007c-1f32-4ed0-a04b-3b482225ef85_PersonIcon.png"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\uploads\\employees\\87c3c4f0-437e-48d6-9198-85883243a0ad\\profile\\9561bb05-bb27-41d9-835f-6f0fb2982008_WIN_20260321_09_52_57_Pro.jpg",
+      "PackagePath": "staticwebassets\\uploads\\employees\\87c3c4f0-437e-48d6-9198-85883243a0ad\\profile\\9561bb05-bb27-41d9-835f-6f0fb2982008_WIN_20260321_09_52_57_Pro.jpg"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\uploads\\employees\\92d89335-13e1-4626-8f9c-9b05f2a1012e\\profile\\1982b9de-e967-4100-9100-efc4269df181_WIN_20260321_09_52_57_Pro.jpg",
+      "PackagePath": "staticwebassets\\uploads\\employees\\92d89335-13e1-4626-8f9c-9b05f2a1012e\\profile\\1982b9de-e967-4100-9100-efc4269df181_WIN_20260321_09_52_57_Pro.jpg"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\uploads\\employees\\92d89335-13e1-4626-8f9c-9b05f2a1012e\\profile\\6adef31e-6ecd-4bc8-91fb-1d475c61bd68_Sagar.jpg",
+      "PackagePath": "staticwebassets\\uploads\\employees\\92d89335-13e1-4626-8f9c-9b05f2a1012e\\profile\\6adef31e-6ecd-4bc8-91fb-1d475c61bd68_Sagar.jpg"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\uploads\\employees\\92d89335-13e1-4626-8f9c-9b05f2a1012e\\profile\\806a2456-f775-4de5-b23d-62736bc05167_WIN_20260321_09_52_57_Pro.jpg",
+      "PackagePath": "staticwebassets\\uploads\\employees\\92d89335-13e1-4626-8f9c-9b05f2a1012e\\profile\\806a2456-f775-4de5-b23d-62736bc05167_WIN_20260321_09_52_57_Pro.jpg"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\uploads\\employees\\92d89335-13e1-4626-8f9c-9b05f2a1012e\\profile\\b00b42b5-a1ad-4a6d-a1fe-9ebc6f740acc_IMG_20251024_114438[1].jpg",
+      "PackagePath": "staticwebassets\\uploads\\employees\\92d89335-13e1-4626-8f9c-9b05f2a1012e\\profile\\b00b42b5-a1ad-4a6d-a1fe-9ebc6f740acc_IMG_20251024_114438[1].jpg"
+    },
+    {
+      "Id": "C:\\Users\\sarad\\OneDrive\\Desktop\\WebAppMVC\\WebappMVC-main\\Firstwebapp\\wwwroot\\uploads\\employees\\92d89335-13e1-4626-8f9c-9b05f2a1012e\\profile\\fb5c7702-64c7-41b1-951c-63318eddce1a_WIN_20260321_09_52_57_Pro.jpg",
+      "PackagePath": "staticwebassets\\uploads\\employees\\92d89335-13e1-4626-8f9c-9b05f2a1012e\\profile\\fb5c7702-64c7-41b1-951c-63318eddce1a_WIN_20260321_09_52_57_Pro.jpg"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.Thekdar.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.build.Thekdar.props",
+      "PackagePath": "build\\Thekdar.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildMultiTargeting.Thekdar.props",
+      "PackagePath": "buildMultiTargeting\\Thekdar.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildTransitive.Thekdar.props",
+      "PackagePath": "buildTransitive\\Thekdar.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

@@ -1,0 +1,396 @@
+﻿@model IEnumerable<Thekdar.Models.JobModel>
+@using Thekdar.Models
+
+@{
+    ViewData["Title"] = "Dashboard";
+    var hour = DateTime.Now.Hour;
+    var greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+}
+
+<style>
+    .stat-card {
+        background: var(--card-bg, white);
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 2px 16px rgba(15,23,42,0.06);
+        border: 1.5px solid #f1f5f9;
+        transition: transform 0.2s, box-shadow 0.2s;
+        position: relative;
+        overflow: hidden;
+    }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(15,23,42,0.1); }
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+    }
+    .stat-card.blue::before { background: #3b82f6; }
+    .stat-card.green::before { background: #22c55e; }
+    .stat-card.teal::before { background: #14b8a6; }
+    .stat-card.orange::before { background: #f59e0b; }
+    .stat-card.purple::before { background: #6366f1; }
+
+    .stat-icon {
+        width: 48px; height: 48px;
+        border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 20px;
+        margin-bottom: 16px;
+    }
+    .stat-icon.blue { background: #eff6ff; color: #3b82f6; }
+    .stat-icon.green { background: #f0fdf4; color: #22c55e; }
+    .stat-icon.teal { background: #ecfdf5; color: #14b8a6; }
+    .stat-icon.orange { background: #fffbeb; color: #f59e0b; }
+    .stat-icon.purple { background: #eef2ff; color: #6366f1; }
+
+    .stat-value {
+        font-size: 32px;
+        font-weight: 700;
+        color: #0e2142;
+        line-height: 1;
+        margin-bottom: 4px;
+        font-family: 'DM Mono', monospace;
+    }
+
+    .stat-label {
+        font-size: 13px;
+        color: #64748b;
+        font-weight: 500;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+
+    .section-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .panel {
+        background: white;
+        border-radius: 16px;
+        border: 1.5px solid #f1f5f9;
+        box-shadow: 0 2px 16px rgba(15,23,42,0.06);
+        overflow: hidden;
+    }
+
+    .panel-header {
+        padding: 20px 24px 16px;
+        border-bottom: 1px solid #f8fafc;
+    }
+
+    .panel-body { padding: 0; }
+
+    .job-row {
+        display: flex;
+        align-items: center;
+        padding: 14px 24px;
+        border-bottom: 1px solid #f8fafc;
+        transition: background 0.1s;
+        gap: 16px;
+    }
+
+    .job-row:last-child { border-bottom: none; }
+    .job-row:hover { background: #fafbfd; }
+
+    .job-dot {
+        width: 10px; height: 10px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    .status-pill {
+        font-size: 11px;
+        font-weight: 600;
+        padding: 3px 10px;
+        border-radius: 20px;
+    }
+
+    .pill-active { background: #eff6ff; color: #3b82f6; }
+    .pill-pending { background: #fffbeb; color: #d97706; }
+    .pill-done { background: #f0fdf4; color: #16a34a; }
+
+    .empty-state {
+        text-align: center;
+        padding: 48px 24px;
+        color: #94a3b8;
+    }
+
+    .empty-state i { font-size: 40px; margin-bottom: 12px; opacity: 0.4; }
+
+    .quick-action {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 16px 20px;
+        border-radius: 14px;
+        text-decoration: none;
+        color: #1e293b;
+        border: 1.5px solid #f1f5f9;
+        background: white;
+        transition: all 0.15s;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    .quick-action:hover {
+        border-color: #3b82f6;
+        color: #3b82f6;
+        box-shadow: 0 4px 16px rgba(59,130,246,0.1);
+        transform: translateY(-1px);
+    }
+
+    .qa-icon {
+        width: 40px; height: 40px;
+        border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 16px;
+        flex-shrink: 0;
+    }
+
+    .greeting-card {
+        background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+        border-radius: 20px;
+        padding: 28px 32px;
+        color: white;
+        margin-bottom: 28px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .greeting-card::after {
+        content: '';
+        position: absolute;
+        right: -40px; top: -40px;
+        width: 200px; height: 200px;
+        border-radius: 50%;
+        background: rgba(59,130,246,0.15);
+    }
+
+    .greeting-card::before {
+        content: '';
+        position: absolute;
+        right: 60px; bottom: -60px;
+        width: 160px; height: 160px;
+        border-radius: 50%;
+        background: rgba(99,102,241,0.1);
+    }
+</style>
+
+@* Greeting Banner *@
+<div class="greeting-card">
+    <div style="position:relative; z-index:1;">
+        <div style="font-size:13px; color:#94a3b8; margin-bottom:4px;">
+            <i class="far fa-calendar-alt me-1"></i>@DateTime.Today.ToString("dddd, MMMM d, yyyy")
+        </div>
+        <h2 style="font-size:24px; font-weight:700; margin-bottom:4px;">
+            @greeting, @User.Identity.Name!👋
+        </h2>
+        <p style="color:#94a3b8; font-size:14px; margin:0;">
+            @{
+                var todayCount = Model.Count();
+            }
+            @if (todayCount == 0)
+            {
+                <span>No jobs scheduled for today all clear.</span>
+            }
+            else
+            {
+                <span>You have <strong style="color:white;">@todayCount job@(todayCount != 1 ? "s" : "")</strong> scheduled today.</span>
+            }
+        </p>
+    </div>
+</div>
+
+@* Stats Row - 5 Cards *@
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3 col-lg-2">
+        <div class="stat-card blue">
+            <div class="stat-icon blue"><i class="fas fa-briefcase"></i></div>
+            <div class="stat-value">@ViewBag.ActiveJobs</div>
+            <div class="stat-label">Active Jobs</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3 col-lg-2">
+        <div class="stat-card green">
+            <div class="stat-icon green"><i class="fas fa-user-tie"></i></div>
+            <div class="stat-value">@ViewBag.ContractorCount</div>
+            <div class="stat-label">Active users</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3 col-lg-2">
+        <div class="stat-card teal">
+            <div class="stat-icon teal"><i class="fas fa-users"></i></div>
+            <div class="stat-value">@ViewBag.WorkerCount</div>
+            <div class="stat-label">Workers</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3 col-lg-2">
+        <div class="stat-card orange">
+            <div class="stat-icon orange"><i class="fas fa-clock"></i></div>
+            <div class="stat-value">@ViewBag.PendingJobs</div>
+            <div class="stat-label">Pending</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3 col-lg-2">
+        <div class="stat-card purple">
+            <div class="stat-icon purple"><i class="fas fa-check-circle"></i></div>
+            <div class="stat-value">@ViewBag.CompletedJobs</div>
+            <div class="stat-label">Completed</div>
+        </div>
+    </div>
+</div>
+
+@* Two column layout *@
+<div class="row g-3 mb-4">
+
+    @* Today's Jobs *@
+    <div class="col-lg-7">
+        <div class="panel">
+            <div class="panel-header section-header">
+                <span class="section-title">
+                    <i class="fas fa-calendar-day me-2 text-primary"></i>Today's Jobs
+                </span>
+                <a asp-controller="Job" asp-action="Index"
+                   style="font-size:13px; color:#3b82f6; text-decoration:none; font-weight:500;">
+                    View all <i class="fas fa-arrow-right ms-1" style="font-size:11px;"></i>
+                </a>
+            </div>
+            <div class="panel-body">
+                @if (!Model.Any())
+                {
+                    <div class="empty-state">
+                        <i class="fas fa-calendar-check d-block"></i>
+                        <p class="mb-3" style="font-size:14px;">No jobs today</p>
+                        @if (User.IsInRole("Admin") || User.IsInRole("Contractor"))
+                        {
+                            <a asp-controller="Job" asp-action="Create"
+                               class="btn btn-primary btn-sm">
+                                <i class="fas fa-plus me-2"></i>Add Job
+                            </a>
+                        }
+                    </div>
+                }
+                else
+                {
+                    @foreach (var job in Model)
+                    {
+                        <div class="job-row">
+                            <div class="job-dot"
+                                 style="background: @(job.Status == JobStatus.Completed ? "#22c55e" : job.Status == JobStatus.PendingConfirmation ? "#f59e0b" : "#3b82f6")">
+                            </div>
+                            <div style="flex:1; min-width:0;">
+                                <div style="font-weight:600; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                    @job.Title
+                                </div>
+                                <div style="font-size:12px; color:#64748b;">
+                                    @(job.ClientName ?? "No client")
+                                    @if (job.ScheduledDate.HasValue)
+                                    {
+                                        <span class="ms-2">
+                                            <i class="far fa-clock me-1"></i>@job.ScheduledDate.Value.ToString("h:mm tt")
+                                        </span>
+                                    }
+                                </div>
+                            </div>
+                            @if (job.Status == JobStatus.Completed)
+                            {
+                                <span class="status-pill pill-done">Done</span>
+                            }
+                            else if (job.Status == JobStatus.PendingConfirmation)
+                            {
+                                <span class="status-pill pill-pending">Pending</span>
+                            }
+                            else
+                            {
+                                <span class="status-pill pill-active">Active</span>
+                            }
+                            <a asp-controller="Job" asp-action="Details" asp-route-id="@job.Id"
+                               style="color:#94a3b8; font-size:13px; text-decoration:none;">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+
+@* Quick Actions *@
+<div class="col-lg-5">
+    <div class="panel" style="height:100%;">
+        <div class="panel-header">
+            <span class="section-title">
+                <i class="fas fa-bolt me-2 text-warning"></i>Quick Actions
+            </span>
+        </div>
+        <div style="padding: 16px; display: flex; flex-direction: column; gap: 10px;">
+
+            @if (User.IsInRole("Admin") || User.IsInRole("Contractor"))
+            {
+                <a asp-controller="Job" asp-action="Create" class="quick-action">
+                    <div class="qa-icon" style="background:#eff6ff; color:#3b82f6;">
+                        <i class="fas fa-plus"></i>
+                    </div>
+                    Create New Job
+                    <i class="fas fa-chevron-right ms-auto" style="font-size:12px; color:#cbd5e1;"></i>
+                </a>
+            }
+
+            <a asp-controller="Job" asp-action="Index" class="quick-action">
+                <div class="qa-icon" style="background:#f0fdf4; color:#22c55e;">
+                    <i class="fas fa-list"></i>
+                </div>
+                View All Jobs
+                <i class="fas fa-chevron-right ms-auto" style="font-size:12px; color:#cbd5e1;"></i>
+            </a>
+
+            <!-- Workers Management - Available to both Admin and Contractor -->
+            @if (User.IsInRole("Admin") || User.IsInRole("Contractor"))
+            {
+                <a asp-controller="Employee" asp-action="Index" class="quick-action">
+                    <div class="qa-icon" style="background:#faf5ff; color:#8b5cf6;">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    Manage Workers
+                    <i class="fas fa-chevron-right ms-auto" style="font-size:12px; color:#cbd5e1;"></i>
+                </a>
+            }
+
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-controller="User" asp-action="List" class="quick-action">
+                    <div class="qa-icon" style="background:#faf5ff; color:#8b5cf6;">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    Manage Contractors
+                    <i class="fas fa-chevron-right ms-auto" style="font-size:12px; color:#cbd5e1;"></i>
+                </a>
+
+                <a asp-controller="Report" asp-action="Index" class="quick-action">
+                    <div class="qa-icon" style="background:#fffbeb; color:#f59e0b;">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    View Reports
+                    <i class="fas fa-chevron-right ms-auto" style="font-size:12px; color:#cbd5e1;"></i>
+                </a>
+            }
+
+            <a asp-controller="Auth" asp-action="Profile" class="quick-action">
+                <div class="qa-icon" style="background:#fff1f2; color:#f43f5e;">
+                    <i class="fas fa-id-card"></i>
+                </div>
+                My Profile
+                <i class="fas fa-chevron-right ms-auto" style="font-size:12px; color:#cbd5e1;"></i>
+            </a>
+
+        </div>
+    </div>
+</div>
+</div>

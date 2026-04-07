@@ -1,0 +1,384 @@
+﻿@model Thekdar.ViewModels.LoginViewModel
+
+@{
+ViewData["Title"] = "Login";
+Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login | Thekdar</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- AOS Animation -->
+    <link href="https://unpkg.com/aos@next/dist/aos.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .auth-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            width: 100%;
+            max-width: 450px;
+            animation: slideUp 0.6s ease;
+        }
+
+        @@keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .auth-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 30px;
+            text-align: center;
+        }
+
+        .auth-header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .auth-header p {
+            opacity: 0.9;
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        .auth-body {
+            padding: 30px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .input-group-text {
+            background: transparent;
+            border: 2px solid #e0e0e0;
+            border-right: none;
+            border-radius: 12px 0 0 12px;
+            color: #667eea;
+        }
+
+        .form-control {
+            border: 2px solid #e0e0e0;
+            border-left: none;
+            border-radius: 0 12px 12px 0;
+            padding: 12px 16px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: none;
+            outline: none;
+        }
+
+        .input-group:focus-within .input-group-text {
+            border-color: #667eea;
+        }
+
+        .input-group:focus-within .form-control {
+            border-color: #667eea;
+        }
+
+        .btn-login {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            padding: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            color: white;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .auth-footer a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .auth-footer a:hover {
+            color: #764ba2;
+        }
+
+        .forgot-link {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .forgot-link:hover {
+            color: #764ba2;
+        }
+
+        .text-danger {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            display: block;
+            color: #dc3545;
+        }
+
+        .form-check-input:checked {
+            background-color: #667eea;
+            border-color: #667eea;
+        }
+
+        .floating-icon {
+            position: absolute;
+            font-size: 15rem;
+            color: rgba(255, 255, 255, 0.03);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .icon-1 {
+            top: 10%;
+            left: 5%;
+            transform: rotate(-15deg);
+        }
+
+        .icon-2 {
+            bottom: 10%;
+            right: 5%;
+            transform: rotate(15deg);
+        }
+
+        /* Tooltip styling */
+        .password-toggle-btn {
+            position: relative;
+        }
+
+        .password-toggle-btn:hover::after {
+            content: attr(title);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+            margin-bottom: 8px;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .password-toggle-btn:hover::before {
+            content: '';
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-top-color: #333;
+            margin-bottom: 2px;
+            z-index: 1000;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+<div class="floating-icon icon-1">
+    <i class="fas fa-briefcase"></i>
+</div>
+<div class="floating-icon icon-2">
+    <i class="fas fa-tasks"></i>
+</div>
+
+<div class="auth-wrapper">
+    <div class="auth-card" data-aos="fade-up">
+        <div class="auth-header">
+            <h1><i class="fas fa-bolt me-2"></i>Welcome Back</h1>
+            <p>Sign in to continue to Thekdar</p>
+        </div>
+
+        <div class="auth-body">
+            @if (TempData["SuccessMessage"] != null)
+            {
+            <div class="alert alert-success py-2" style="border-radius: 10px; background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%); border: none;">
+                <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+            </div>
+            }
+
+            <form asp-action="Login" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <!-- Email -->
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label">
+                        <i class="fas fa-envelope me-2"></i>Email Address
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                        <input asp-for="Email" class="form-control" placeholder="Enter your email" />
+                    </div>
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <!-- Password with toggle -->
+                <div class="mb-3">
+                    <label asp-for="Password" class="form-label">
+                        <i class="fas fa-lock me-2"></i>Password
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                        <input asp-for="Password" class="form-control" type="password" id="loginPassword" placeholder="Enter your password" />
+                        <button type="button" class="btn btn-outline-secondary password-toggle-btn"
+                                onclick="togglePassword('loginPassword', this)"
+                                title="Show/Hide password">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+
+                <!-- Forgot Password Link -->
+                <div class="text-end mb-3">
+                    <a asp-action="ForgotPassword" class="forgot-link">
+                        <i class="fas fa-question-circle me-1"></i>Forgot Password?
+                    </a>
+                </div>
+
+                <!-- Remember Me -->
+                <div class="mb-3 form-check">
+                    <input asp-for="RememberMe" class="form-check-input" />
+                    <label asp-for="RememberMe" class="form-check-label">Remember me on this device</label>
+                </div>
+                <div class="form-text mb-3">
+                    Keeps you signed in for up to 7 days and remembers your email on this browser.
+                </div>
+
+                <button type="submit" class="btn-login">
+                    <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                </button>
+            </form>
+
+            <div class="auth-footer">
+                <p class="mb-0">
+                    Don't have an account?
+                    <a asp-action="Register">
+                        Create Account <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script>
+    AOS.init({
+        duration: 800,
+        once: true
+    });
+
+    const rememberMeKey = 'Thekdar.rememberedEmail';
+    const loginForm = document.querySelector('form[asp-action="Login"]') || document.querySelector('form');
+    const emailInput = document.getElementById('Email');
+    const rememberMeInput = document.getElementById('RememberMe');
+
+    if (emailInput && rememberMeInput) {
+        const rememberedEmail = localStorage.getItem(rememberMeKey);
+
+        if (!emailInput.value && rememberedEmail) {
+            emailInput.value = rememberedEmail;
+            rememberMeInput.checked = true;
+        }
+
+        rememberMeInput.addEventListener('change', function() {
+            if (!this.checked) {
+                localStorage.removeItem(rememberMeKey);
+            }
+        });
+    }
+
+    if (loginForm && emailInput && rememberMeInput) {
+        loginForm.addEventListener('submit', function() {
+            const trimmedEmail = emailInput.value.trim();
+
+            if (rememberMeInput.checked && trimmedEmail) {
+                localStorage.setItem(rememberMeKey, trimmedEmail);
+            } else {
+                localStorage.removeItem(rememberMeKey);
+            }
+        });
+    }
+
+    function togglePassword(inputId, button) {
+        const input = document.getElementById(inputId);
+        const icon = button.querySelector('i');
+
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+</script>
+</body>
+</html>

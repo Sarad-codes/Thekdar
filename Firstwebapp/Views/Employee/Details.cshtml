@@ -1,0 +1,177 @@
+@model EmployeeViewModel
+@using System.Security.Claims
+
+@{
+    ViewData["Title"] = "Employee Details";
+    int? currentUserId = null;
+    if (int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var uid))
+        currentUserId = uid;
+    var canEditWorker = User.IsInRole("Admin")
+        || (User.IsInRole("Contractor") && Model.ContractorId == currentUserId);
+    var isAdmin = User.IsInRole("Admin");
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0"><i class="fas fa-user me-2"></i>Employee Details</h4>
+                </div>
+                <div class="card-body">
+                    <!-- Profile Picture Section -->
+                    <div class="text-center mb-4">
+                        @if (!string.IsNullOrEmpty(Model.ExistingProfilePicturePath))
+                        {
+                            <img src="@Model.ExistingProfilePicturePath" 
+                                 alt="@Model.FullName" 
+                                 class="rounded-circle border border-primary shadow-sm" 
+                                 style="width: 120px; height: 120px; object-fit: cover; cursor: pointer;" 
+                                 onclick="openImageModal('@Model.ExistingProfilePicturePath')" />
+                        }
+                        else
+                        {
+                            <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center border shadow-sm" 
+                                 style="width: 120px; height: 120px; cursor: pointer;" 
+                                 onclick="openImageModal(null)">
+                                <i class="fas fa-user-circle fa-5x text-secondary"></i>
+                            </div>
+                        }
+                        <h3 class="mt-3 mb-1">@Model.FullName</h3>
+                        <div class="mt-2">
+                            <span class="badge bg-info px-3 py-2">
+                                <i class="fas fa-tools me-1"></i>@Model.Trade
+                            </span>
+                            @if (Model.IsAvailable)
+                            {
+                                <span class="badge bg-success px-3 py-2 ms-2">
+                                    <i class="fas fa-check-circle me-1"></i>Available
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary px-3 py-2 ms-2">
+                                    <i class="fas fa-clock me-1"></i>Unavailable
+                                </span>
+                            }
+                        </div>
+                        @if (isAdmin)
+                        {
+                            <div class="mt-2">
+                                <small class="text-muted">
+                                    <i class="fas fa-user-tie me-1"></i>Contractor: @(Model.ContractorName ?? "—")
+                                </small>
+                            </div>
+                        }
+                    </div>
+
+                    <hr />
+
+                    <!-- Employee Information Table -->
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                             <tr>
+                                <th class="bg-light" style="width:35%">
+                                    <i class="fas fa-phone me-2 text-muted"></i>Primary Phone
+                                </th>
+                                <td>@Model.Phone</td>
+                             </tr>
+                             <tr>
+                                <th class="bg-light">
+                                    <i class="fas fa-phone-alt me-2 text-muted"></i>Secondary Phone
+                                </th>
+                                <td>@(Model.Phone2 ?? "—")</td>
+                             </tr>
+                             <tr>
+                                <th class="bg-light">
+                                    <i class="fas fa-envelope me-2 text-muted"></i>Email
+                                </th>
+                                <td>@(Model.Email ?? "—")</td>
+                             </tr>
+                             <tr>
+                                 <th class="bg-light">
+                                     <i class="fas fa-money-bill-wave me-2 text-muted"></i>Daily Rate
+                                 </th>
+                                 <td>NPR @Model.DailyRate.ToString("N0") / day</td>
+                             </tr>
+                             <tr>
+                                <th class="bg-light">
+                                    <i class="fas fa-id-card me-2 text-muted"></i>PAN Number
+                                </th>
+                                <td>@(Model.PanNumber ?? "—")</td>
+                             </tr>
+                             <tr>
+                                <th class="bg-light">
+                                    <i class="fas fa-calendar-alt me-2 text-muted"></i>Hire Date
+                                </th>
+                                <td>@Model.HireDate.ToString("MMM dd, yyyy")</td>
+                             </tr>
+                        </table>
+                    </div>
+
+                    <!-- PAN Card Image Preview -->
+                    @if (!string.IsNullOrEmpty(Model.ExistingPanCardPath))
+                    {
+                        <div class="mt-4">
+                            <h5 class="fw-semibold mb-3">
+                                <i class="fas fa-id-card text-primary me-2"></i>PAN Card Image
+                            </h5>
+                            <div class="border rounded p-3 text-center bg-light">
+                                <img src="@Model.ExistingPanCardPath" 
+                                     alt="PAN Card" 
+                                     class="img-fluid" 
+                                     style="max-height: 300px; cursor: pointer;" 
+                                     onclick="openImageModal('@Model.ExistingPanCardPath')" />
+                                <p class="text-muted mt-2 small">Click image to enlarge</p>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex gap-2 mt-4">
+                        @if (canEditWorker)
+                        {
+                            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning flex-fill">
+                                <i class="fas fa-edit me-2"></i>Edit
+                            </a>
+                        }
+                        <a asp-action="Index" class="btn btn-outline-secondary flex-fill">
+                            <i class="fas fa-arrow-left me-2"></i>Back to List
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Image Modal for Enlarged View -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-image me-2"></i>Image Preview
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" alt="Preview" class="img-fluid" style="max-height: 70vh;" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function openImageModal(imageSrc) {
+            if (imageSrc) {
+                document.getElementById('modalImage').src = imageSrc;
+                new bootstrap.Modal(document.getElementById('imageModal')).show();
+            }
+        }
+    </script>
+}

@@ -1,0 +1,229 @@
+﻿@{
+    ViewData["Title"] = "Home";
+    // Layout = null;
+}
+
+<!-- Hero Section -->
+<section class="hero-section bg-gradient-primary text-white py-5">
+    <div class="container">
+        <div class="row align-items-center min-vh-75 py-5">
+            <div class="col-lg-6 mb-5 mb-lg-0" data-aos="fade-right">
+                <h1 class="display-3 fw-bold mb-4">
+                    Welcome to <span class="text-warning">Thekdar</span>
+                </h1>
+                <p class="lead mb-4 opacity-75">
+                    Streamline your business operations with our powerful job management platform. 
+                    Manage contractors, track jobs, and grow your business effortlessly.
+                </p>
+                <div class="d-flex gap-3">
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <a asp-controller="Home" asp-action="Dashboard" class="btn btn-light btn-lg px-5 py-3 rounded-pill shadow-lg">
+                            <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Auth" asp-action="Register" class="btn btn-light btn-lg px-5 py-3 rounded-pill shadow-lg">
+                            <i class="fas fa-user-plus me-2"></i>Get Started
+                        </a>
+                        <a asp-controller="Auth" asp-action="Login" class="btn btn-outline-light btn-lg px-5 py-3 rounded-pill">
+                            <i class="fas fa-sign-in-alt me-2"></i>Login
+                        </a>
+                    }
+                </div>
+            </div>
+            <div class="col-lg-6" data-aos="fade-left">
+                <img src="https://illustrations.popsy.co/white/app-launch.svg" alt="Hero Illustration" class="img-fluid">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold">Why Choose Us?</h2>
+            <p class="lead text-muted">Everything you need to manage your jobs effectively</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4" data-aos="fade-up">
+                <div class="card h-100 border-0 shadow-sm hover-card">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon bg-primary bg-gradient text-white rounded-circle mb-4 mx-auto">
+                            <i class="fas fa-briefcase fa-3x p-4"></i>
+                        </div>
+                        <h3 class="h4 fw-bold mb-3">Job Management</h3>
+                        <p class="text-muted">Create, track, and manage all your jobs in one place with ease.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="card h-100 border-0 shadow-sm hover-card">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon bg-success bg-gradient text-white rounded-circle mb-4 mx-auto">
+                            <i class="fas fa-users fa-3x p-4"></i>
+                        </div>
+                        <h3 class="h4 fw-bold mb-3">Contractor Management</h3>
+                        <p class="text-muted">Manage contractors and assign them to jobs efficiently.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="card h-100 border-0 shadow-sm hover-card">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon bg-info bg-gradient text-white rounded-circle mb-4 mx-auto">
+                            <i class="fas fa-chart-line fa-3x p-4"></i>
+                        </div>
+                        <h3 class="h4 fw-bold mb-3">Real-time Analytics</h3>
+                        <p class="text-muted">Get insights into your business performance with detailed reports.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="py-5 bg-primary text-white">
+    <div class="container">
+        <div class="row g-4 text-center">
+            <div class="col-md-3 col-6" data-aos="zoom-in">
+                <div class="display-3 fw-bold mb-2">10K+</div>
+                <p class="opacity-75 mb-0">Jobs Completed</p>
+            </div>
+            <div class="col-md-3 col-6" data-aos="zoom-in" data-aos-delay="100">
+                <div class="display-3 fw-bold mb-2">500+</div>
+                <p class="opacity-75 mb-0">Active Contractors</p>
+            </div>
+            <div class="col-md-3 col-6" data-aos="zoom-in" data-aos-delay="200">
+                <div class="display-3 fw-bold mb-2">50+</div>
+                <p class="opacity-75 mb-0">Cities Covered</p>
+            </div>
+            <div class="col-md-3 col-6" data-aos="zoom-in" data-aos-delay="300">
+                <div class="display-3 fw-bold mb-2">24/7</div>
+                <p class="opacity-75 mb-0">Support</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold">How It Works</h2>
+            <p class="lead text-muted">Get started in three simple steps</p>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-4 mb-4 mb-md-0" data-aos="fade-right">
+                <div class="text-center">
+                    <div class="step-number bg-primary text-white rounded-circle mx-auto mb-4">1</div>
+                    <h3 class="h4 fw-bold mb-3">Create Account</h3>
+                    <p class="text-muted">Sign up for free and set up your profile in minutes.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4 mb-md-0" data-aos="fade-up">
+                <div class="text-center">
+                    <div class="step-number bg-primary text-white rounded-circle mx-auto mb-4">2</div>
+                    <h3 class="h4 fw-bold mb-3">Add Jobs</h3>
+                    <p class="text-muted">Create and schedule jobs, assign contractors.</p>
+                </div>
+            </div>
+            <div class="col-md-4" data-aos="fade-left">
+                <div class="text-center">
+                    <div class="step-number bg-primary text-white rounded-circle mx-auto mb-4">3</div>
+                    <h3 class="h4 fw-bold mb-3">Track Progress</h3>
+                    <p class="text-muted">Monitor job status and get real-time updates.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h2 class="display-5 fw-bold mb-4">Ready to Get Started?</h2>
+                <p class="lead text-muted mb-4">
+                    Join thousands of businesses already using Thekdar to streamline their operations.
+                </p>
+                @if (!User.Identity.IsAuthenticated)
+                {
+                    <a asp-controller="Auth" asp-action="Register" class="btn btn-primary btn-lg px-5 py-3 rounded-pill shadow-lg">
+                        <i class="fas fa-rocket me-2"></i>Start Free Trial
+                    </a>
+                }
+                else
+                {
+                    <a asp-controller="Home" asp-action="Dashboard" class="btn btn-primary btn-lg px-5 py-3 rounded-pill shadow-lg">
+                        <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .min-vh-75 {
+        min-height: 75vh;
+    }
+    
+    .feature-icon {
+        width: 100px;
+        height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .hover-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .hover-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 30px rgba(0,0,0,0.1) !important;
+    }
+    
+    .step-number {
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        font-weight: bold;
+    }
+    
+    [data-aos] {
+        opacity: 0;
+        transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    
+    [data-aos].aos-animate {
+        opacity: 1;
+    }
+</style>
+
+@section Scripts {
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 800,
+            once: true
+        });
+    </script>
+}

@@ -1,0 +1,30 @@
+@{
+    ViewData["Title"] = "403 - Access Denied";
+    Layout = "_Layout";
+}
+
+<div class="container text-center py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="mb-4">
+                <i class="fas fa-lock fa-5x text-danger"></i>
+            </div>
+            <h1 class="display-1 fw-bold text-danger">403</h1>
+            <h2 class="mb-4">Access Denied</h2>
+            <p class="lead mb-4">
+                You don't have permission to access this page.
+            </p>
+            <p class="text-muted mb-4">
+                Please contact your administrator if you believe this is an error.
+            </p>
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                <a href="/" class="btn btn-primary btn-lg px-4 gap-3">
+                    <i class="fas fa-home me-2"></i>Go Home
+                </a>
+                <a href="/Auth/Login" class="btn btn-outline-secondary btn-lg px-4">
+                    <i class="fas fa-sign-in-alt me-2"></i>Login
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

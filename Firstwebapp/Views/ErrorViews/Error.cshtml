@@ -1,0 +1,50 @@
+@model ErrorViewModel
+@{
+    ViewData["Title"] = "Error";
+    Layout = "_Layout";
+}
+
+<div class="container text-center py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="mb-4">
+                <i class="fas fa-exclamation-circle fa-5x text-danger"></i>
+            </div>
+            <h1 class="display-1 fw-bold text-danger">Error</h1>
+            <h2 class="mb-4">An error occurred while processing your request.</h2>
+            
+            @if (Model.ShowRequestId)
+            {
+                <p class="text-muted">
+                    <strong>Request ID:</strong> <code>@Model.RequestId</code>
+                </p>
+            }
+            
+            @if (Model.ShowDetailedError)
+            {
+                <hr class="my-4" />
+                <div class="alert alert-danger text-start">
+                    <h5>Exception Details:</h5>
+                    <pre class="mb-0"><code>@Model.Exception?.ToString()</code></pre>
+                    @if (!string.IsNullOrEmpty(Model.Path))
+                    {
+                        <p class="mt-2 mb-0"><strong>Path:</strong> @Model.Path</p>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info mt-4">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Please try again later or contact support if the problem persists.
+                </div>
+            }
+            
+            <div class="mt-4">
+                <a href="/" class="btn btn-primary">
+                    <i class="fas fa-home me-2"></i>Go Home
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,314 @@
+﻿@model List<Thekdar.Models.UserModel>
+@using Thekdar.Models
+
+@{
+    ViewData["Title"] = "Contractor Management";
+    var currentFilter = ViewBag.CurrentFilter ?? "All";
+}
+
+<div class="container-fluid px-3 px-md-4 py-4">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
+        <h2 class="mb-3 mb-md-0">
+            <i class="fas fa-hard-hat me-2 text-primary"></i>Contractor Management
+        </h2>
+        @if (User.IsInRole("Admin"))
+        {
+            <a asp-controller="User" asp-action="Register" class="btn btn-primary w-100 w-md-auto">
+                <i class="fas fa-user-plus me-2"></i>Add New Contractor
+            </a>
+        }
+    </div>
+
+    <!-- Filter Buttons -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
+        <div class="btn-group w-100 w-md-auto mb-3 mb-md-0" role="group">
+            <a asp-action="List" asp-route-filter="All"
+               class="btn btn-outline-primary @(currentFilter == "All" ? "active" : "")">
+                All
+            </a>
+            <a asp-action="List" asp-route-filter="Active"
+               class="btn btn-outline-success @(currentFilter == "Active" ? "active" : "")">
+                Active
+            </a>
+            <a asp-action="List" asp-route-filter="Inactive"
+               class="btn btn-outline-secondary @(currentFilter == "Inactive" ? "active" : "")">
+                Inactive
+            </a>
+        </div>
+        <span class="badge bg-light text-dark p-2">
+            <i class="fas fa-users me-1"></i> @Model.Count() contractor@(Model.Count() != 1 ? "s" : "")
+        </span>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5">
+            <i class="fas fa-user-slash fa-4x text-muted mb-3"></i>
+            <h5 class="text-muted">No contractors found</h5>
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-action="Register" class="btn btn-primary mt-3">
+                    <i class="fas fa-plus me-2"></i>Add First Contractor
+                </a>
+            }
+        </div>
+    }
+    else
+    {
+        <!-- Desktop Table -->
+        <div class="d-none d-md-block">
+            <div class="card shadow-sm">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-4">Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Age</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <th class="text-end pe-4">Actions</th>
+                                    }
+                                 </thead>
+                            <tbody>
+                                @foreach (var user in Model)
+                                {
+                                    <tr>
+                                        <td class="ps-4 fw-semibold">
+                                            @if (user.ProfilePicture != null)
+                                            {
+                                                <img src="@Url.Action("GetProfilePicture", "User", new { id = user.Id })"
+                                                     alt="@user.Name"
+                                                     class="rounded-circle me-2 contractor-list-avatar"
+                                                     role="button"
+                                                     tabindex="0"
+                                                     title="Click to enlarge"
+                                                     aria-label="View @user.Name profile picture larger"
+                                                     style="width: 32px; height: 32px; object-fit: cover; cursor: pointer;" />
+                                            }
+                                            else
+                                            {
+                                                <i class="fas fa-user-circle me-2 text-muted"></i>
+                                            }
+                                            @user.Name
+                                        </td>
+                                        <td>@user.Email</td>
+                                        <td>@user.Phone</td>
+                                        <td>@user.Age</td>
+                                        <td>
+                                            @if (user.Role == UserRole.Admin)
+                                            {
+                                                <span class="badge bg-danger">
+                                                    <i class="fas fa-crown me-1"></i>Admin
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-primary">
+                                                    <i class="fas fa-hard-hat me-1"></i>Contractor
+                                                </span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (user.Status == UserStatus.Active)
+                                            {
+                                                <span class="badge bg-success">Active</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">Inactive</span>
+                                            }
+                                        </td>
+                                        @if (User.IsInRole("Admin"))
+                                        {
+                                            <td class="text-end pe-4">
+                                                <div class="d-flex gap-2 justify-content-end">
+                                                    <a asp-action="Details" asp-route-id="@user.Id"
+                                                       class="btn btn-sm btn-outline-info" title="View">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a asp-action="Edit" asp-route-id="@user.Id"
+                                                       class="btn btn-sm btn-outline-primary" title="Edit">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    @if (user.Status == UserStatus.Active)
+                                                    {
+                                                        <form asp-action="Deactivate" asp-route-id="@user.Id" method="post" class="d-inline">
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit" class="btn btn-sm btn-outline-warning"
+                                                                    onclick="return confirm('Deactivate @user.Name?')">
+                                                                <i class="fas fa-ban"></i>
+                                                            </button>
+                                                        </form>
+                                                    }
+                                                    else
+                                                    {
+                                                        <form asp-action="Activate" asp-route-id="@user.Id" method="post" class="d-inline">
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit" class="btn btn-sm btn-outline-success"
+                                                                    onclick="return confirm('Activate @user.Name?')">
+                                                                <i class="fas fa-check-circle"></i>
+                                                            </button>
+                                                        </form>
+                                                    }
+                                                </div>
+                                            </td>
+                                        }
+                                     </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Cards -->
+        <div class="d-block d-md-none">
+            <div class="row g-3">
+                @foreach (var user in Model)
+                {
+                    <div class="col-12">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div class="d-flex align-items-center gap-2">
+                                        @if (user.ProfilePicture != null)
+                                        {
+                                            <img src="@Url.Action("GetProfilePicture", "User", new { id = user.Id })"
+                                                 alt="@user.Name"
+                                                 class="rounded-circle contractor-list-avatar"
+                                                 role="button"
+                                                 tabindex="0"
+                                                 title="Click to enlarge"
+                                                 aria-label="View @user.Name profile picture larger"
+                                                 style="width: 40px; height: 40px; object-fit: cover; cursor: pointer;" />
+                                        }
+                                        else
+                                        {
+                                            <i class="fas fa-user-circle fa-2x text-muted"></i>
+                                        }
+                                        <h5 class="mb-0 fw-semibold">@user.Name</h5>
+                                    </div>
+                                    @if (user.Status == UserStatus.Active)
+                                    {
+                                        <span class="badge bg-success">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Inactive</span>
+                                    }
+                                </div>
+
+                                <!-- Role badge -->
+                                <div class="mb-2 mt-2">
+                                    @if (user.Role == UserRole.Admin)
+                                    {
+                                        <span class="badge bg-danger"><i class="fas fa-crown me-1"></i>Admin</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-primary"><i class="fas fa-hard-hat me-1"></i>Contractor</span>
+                                    }
+                                </div>
+
+                                <div class="row mb-3 small">
+                                    <div class="col-4 text-muted">Email:</div>
+                                    <div class="col-8">@user.Email</div>
+                                    <div class="col-4 text-muted">Phone:</div>
+                                    <div class="col-8">@user.Phone</div>
+                                    <div class="col-4 text-muted">Age:</div>
+                                    <div class="col-8">@user.Age</div>
+                                </div>
+
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <div class="d-flex gap-2 flex-wrap">
+                                        <a asp-action="Details" asp-route-id="@user.Id"
+                                           class="btn btn-sm btn-outline-info flex-fill">
+                                            <i class="fas fa-eye me-1"></i>View
+                                        </a>
+                                        <a asp-action="Edit" asp-route-id="@user.Id"
+                                           class="btn btn-sm btn-outline-primary flex-fill">
+                                            <i class="fas fa-edit me-1"></i>Edit
+                                        </a>
+                                        @if (user.Status == UserStatus.Active)
+                                        {
+                                            <form asp-action="Deactivate" asp-route-id="@user.Id" method="post" class="flex-fill">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-sm btn-outline-warning w-100"
+                                                        onclick="return confirm('Deactivate @user.Name?')">
+                                                    <i class="fas fa-ban me-1"></i>Deactivate
+                                                </button>
+                                            </form>
+                                        }
+                                        else
+                                        {
+                                            <form asp-action="Activate" asp-route-id="@user.Id" method="post" class="flex-fill">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-sm btn-outline-success w-100"
+                                                        onclick="return confirm('Activate @user.Name?')">
+                                                    <i class="fas fa-check-circle me-1"></i>Activate
+                                                </button>
+                                            </form>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+<div class="modal fade" id="contractorListPictureEnlargeModal" tabindex="-1" aria-labelledby="contractorListPictureEnlargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 bg-dark">
+            <div class="modal-header border-secondary border-opacity-25 py-2">
+                <h5 class="modal-title text-white small mb-0" id="contractorListPictureEnlargeModalLabel">Profile picture</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-3">
+                <img id="contractorListPictureEnlargeImg" src="" alt="" class="img-fluid rounded" style="max-height: min(85vh, 720px); object-fit: contain;" />
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    (function () {
+        const modalEl = document.getElementById('contractorListPictureEnlargeModal');
+        const modalImg = document.getElementById('contractorListPictureEnlargeImg');
+        if (!modalEl || !modalImg || typeof bootstrap === 'undefined') return;
+
+        const modal = new bootstrap.Modal(modalEl);
+
+        function openFor(img) {
+            modalImg.src = img.currentSrc || img.src;
+            modalImg.alt = img.alt || 'Profile picture';
+            modal.show();
+        }
+
+        document.querySelectorAll('.contractor-list-avatar').forEach(function (img) {
+            img.addEventListener('click', function (e) {
+                e.stopPropagation();
+                openFor(img);
+            });
+            img.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    openFor(img);
+                }
+            });
+        });
+    })();
+</script>
+}

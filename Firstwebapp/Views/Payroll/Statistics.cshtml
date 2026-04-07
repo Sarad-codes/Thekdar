@@ -1,0 +1,171 @@
+﻿@model Thekdar.ViewModels.PayrollStatisticsViewModel
+@{
+    ViewData["Title"] = "Payroll Statistics";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <i class="fas fa-chart-bar text-primary me-2"></i>Payroll Statistics
+        </h2>
+        <a asp-action="History" class="btn btn-outline-secondary">
+            <i class="fas fa-history me-2"></i>Back to History
+        </a>
+    </div>
+
+    <!-- Filter -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-5">
+                    <label class="form-label">From Date</label>
+                    <input type="date" name="startDate" class="form-control" value="@ViewBag.StartDate" />
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label">To Date</label>
+                    <input type="date" name="endDate" class="form-control" value="@ViewBag.EndDate" />
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">Apply Filter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Overview Cards -->
+    <div class="row mb-4 g-3">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h6>Total Payments</h6>
+                    <h2 class="mb-0">@Model.TotalPayments</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h6>Total Paid</h6>
+                    <h4 class="mb-0">@Model.FormattedTotalPaid</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-dark">
+                <div class="card-body">
+                    <h6>Total Pending</h6>
+                    <h4 class="mb-0">@Model.FormattedTotalPending</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h6>Avg Daily Wage</h6>
+                    <h4 class="mb-0">@Model.FormattedAverageDailyWage</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Status Breakdown -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h6 class="mb-0">Payment Status</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span>Paid (@Model.PaidCount)</span>
+                            <span class="text-success">@Model.FormattedTotalPaid</span>
+                        </div>
+                        <div class="progress mb-2">
+                            <div class="progress-bar bg-success" style="width: @(Model.TotalPayments > 0 ? (Model.PaidCount * 100 / Model.TotalPayments) : 0)%"></div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span>Pending (@Model.PendingCount)</span>
+                            <span class="text-warning">@Model.FormattedTotalPending</span>
+                        </div>
+                        <div class="progress mb-2">
+                            <div class="progress-bar bg-warning" style="width: @(Model.TotalPayments > 0 ? (Model.PendingCount * 100 / Model.TotalPayments) : 0)%"></div>
+                        </div>
+                    </div>
+                    @if (Model.OverdueCount > 0)
+                    {
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between">
+                                <span>Overdue (@Model.OverdueCount)</span>
+                                <span class="text-danger">@Model.FormattedTotalOverdue</span>
+                            </div>
+                            <div class="progress mb-2">
+                                <div class="progress-bar bg-danger" style="width: @(Model.TotalPayments > 0 ? (Model.OverdueCount * 100 / Model.TotalPayments) : 0)%"></div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Work Summary -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h6 class="mb-0">Work Summary</h6>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                         <tr>
+                            <td>Total Days Worked</td>
+                            <td class="text-end fw-bold">@Model.TotalDaysWorked days</td>
+                        </tr>
+                        <tr>
+                            <td>Total Overtime Hours</td>
+                            <td class="text-end fw-bold">@Model.TotalOvertimeHours hrs</td>
+                        </tr>
+                        <tr>
+                            <td>Average Daily Wage</td>
+                            <td class="text-end fw-bold text-success">@Model.FormattedAverageDailyWage</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monthly Breakdown -->
+    @if (Model.MonthlyTotals.Any())
+    {
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <h6 class="mb-0">Monthly Breakdown</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                             <tr>
+                                <th>Month</th>
+                                <th>Payments</th>
+                                <th>Total Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var month in Model.MonthlyTotals)
+                            {
+                                <tr>
+                                    <td>@month.Key</td>
+                                    <td>@(Model.MonthlyPayments.ContainsKey(month.Key) ? Model.MonthlyPayments[month.Key] : 0)</td>
+                                    <td class="fw-bold text-success">NPR @month.Value.ToString("N0")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>

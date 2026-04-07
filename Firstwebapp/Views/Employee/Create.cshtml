@@ -1,0 +1,120 @@
+@model EmployeeViewModel
+@{
+    ViewData["Title"] = "Add Worker";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0"><i class="fas fa-user-plus me-2"></i>Add New Worker</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post" enctype="multipart/form-data">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="FirstName" class="form-label fw-bold"></label>
+                                <input asp-for="FirstName" class="form-control" />
+                                <span asp-validation-for="FirstName" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="LastName" class="form-label fw-bold"></label>
+                                <input asp-for="LastName" class="form-control" />
+                                <span asp-validation-for="LastName" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Trade" class="form-label fw-bold"></label>
+                                <input asp-for="Trade" class="form-control" placeholder="e.g., Mason, Carpenter, Electrician" />
+                                <span asp-validation-for="Trade" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="DailyRate" class="form-label fw-bold"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text">NPR</span>
+                                    <input asp-for="DailyRate" class="form-control" type="number" step="100" />
+                                </div>
+                                <span asp-validation-for="DailyRate" class="text-danger"></span>
+                                <small class="text-muted">Daily wage in Nepali Rupees (NPR)</small>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Phone" class="form-label fw-bold"></label>
+                                <input asp-for="Phone" class="form-control" placeholder="10-digit phone number" />
+                                <span asp-validation-for="Phone" class="text-danger"></span>
+                                <small class="text-muted">Required - Must be exactly 10 digits</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Phone2" class="form-label fw-bold">Secondary Phone (Optional)</label>
+                                <input asp-for="Phone2" class="form-control" placeholder="10-digit phone number" />
+                                <span asp-validation-for="Phone2" class="text-danger"></span>
+                                <small class="text-muted">Optional - Must be exactly 10 digits if provided</small>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Email" class="form-label fw-bold"></label>
+                                <input asp-for="Email" class="form-control" type="email" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="HireDate" class="form-label fw-bold"></label>
+                                <input asp-for="HireDate" class="form-control" type="date" />
+                                <span asp-validation-for="HireDate" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="PanNumber" class="form-label fw-bold">PAN Number (Optional)</label>
+                                <input asp-for="PanNumber" class="form-control" />
+                                <span asp-validation-for="PanNumber" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="IsAvailable" class="form-label fw-bold"></label>
+                                <div class="form-check">
+                                    <input asp-for="IsAvailable" class="form-check-input" />
+                                    <label asp-for="IsAvailable" class="form-check-label">Available for work</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ProfilePicture" class="form-label fw-bold">Profile Picture (Optional)</label>
+                                <input asp-for="ProfilePicture" class="form-control" type="file" accept="image/*" />
+                                <small class="text-muted">Max 5MB. JPG, PNG, GIF, WEBP only</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="PanCardImage" class="form-label fw-bold">PAN Card Image (Optional)</label>
+                                <input asp-for="PanCardImage" class="form-control" type="file" accept="image/*" />
+                                <small class="text-muted">Max 5MB. JPG, PNG, GIF, WEBP only</small>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Save Worker
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

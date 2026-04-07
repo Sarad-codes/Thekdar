@@ -1,0 +1,154 @@
+﻿@model EmployeeViewModel
+@using Thekdar.Models
+
+@{
+    ViewData["Title"] = "Deactivate Employee";
+    var activeAssignments = ViewBag.ActiveAssignments as List<JobAssignmentModel> ?? new List<JobAssignmentModel>();
+    var hasActiveAssignments = ViewBag.HasActiveAssignments as bool? ?? false;
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 border-warning">
+                <div class="card-header bg-warning text-white">
+                    <h4 class="mb-0"><i class="fas fa-user-slash me-2"></i>Deactivate Employee</h4>
+                </div>
+                <div class="card-body">
+                    @if (hasActiveAssignments)
+                    {
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>@Model.FirstName @Model.LastName</strong> is currently assigned to active jobs.
+                            They will be automatically unassigned upon deactivation.
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="fw-semibold mb-2">
+                                <i class="fas fa-briefcase me-2 text-warning"></i>Active Job Assignments:
+                            </label>
+                            <div class="list-group">
+                                @foreach (var assignment in activeAssignments)
+                                {
+                                    <div class="list-group-item">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <i class="fas fa-briefcase me-2 text-primary"></i>
+                                                <strong>@(assignment.Job?.Title ?? "Unknown Job")</strong>
+                                                <br />
+                                                <small class="text-muted">
+                                                    <i class="fas fa-user-tie me-1"></i>Role: @assignment.Role
+                                                    @if (assignment.Job?.ScheduledDate.HasValue == true)
+                                                    {
+                                                        <span class="ms-2">
+                                                            <i class="fas fa-calendar-alt me-1"></i>
+                                                            @assignment.Job.ScheduledDate.Value.ToString("MMM dd, yyyy")
+                                                        </span>
+                                                    }
+                                                </small>
+                                            </div>
+                                            <span class="badge bg-warning text-dark">Active</span>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            These employees will be automatically unassigned from all jobs. You can assign new employees later.
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="confirmUnassign" required />
+                            <label class="form-check-label" for="confirmUnassign">
+                                I understand that <strong>@activeAssignments.Count</strong> active job assignment@(activeAssignments.Count != 1 ? "s" : "") will be removed.
+                            </label>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Are you sure you want to <strong>deactivate</strong> <strong>@Model.FirstName @Model.LastName</strong>?
+                            This employee will no longer appear in active lists. You can reactivate them later.
+                        </div>
+                        
+                        <table class="table table-bordered mb-4">
+                             <tr>
+                                <th class="bg-light" style="width:35%">Name</th>
+                                <td class="fw-semibold">@Model.FirstName @Model.LastName</td>
+                             </tr>
+                             <tr>
+                                <th class="bg-light">Trade</th>
+                                <td class="fw-semibold">@Model.Trade</td>
+                             </tr>
+                             <tr>
+                                <th class="bg-light">Phone</th>
+                                <td class="fw-semibold">@Model.Phone</td>
+                             </tr>
+                             <tr>
+                                <th class="bg-light">Daily Rate</th>
+                                <td class="fw-semibold">NPR @Model.DailyRate.ToString("N0") / day</td>
+                             </tr>
+                        </table>
+                    }
+
+                    <div class="d-flex gap-2">
+                        <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="flex-fill" id="deleteForm">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-warning w-100" id="deleteBtn">
+                                <i class="fas fa-user-slash me-2"></i>
+                                @(hasActiveAssignments ? "Yes, Unassign & Deactivate" : "Yes, Deactivate")
+                            </button>
+                        </form>
+                        <a asp-action="Index" class="btn btn-outline-secondary flex-fill">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Prevent back button issues after deactivation
+        (function() {
+            window.history.pushState(null, "", window.location.href);
+            
+            window.onpopstate = function() {
+                window.location.href = '@Url.Action("Index")';
+            };
+            
+            const deleteForm = document.getElementById('deleteForm');
+            if (deleteForm) {
+                deleteForm.addEventListener('submit', function(e) {
+                    @if (hasActiveAssignments)
+                    {
+                        <text>
+                        const confirmCheckbox = document.getElementById('confirmUnassign');
+                        if (!confirmCheckbox || !confirmCheckbox.checked) {
+                            e.preventDefault();
+                            alert('Please confirm that you understand the active assignments will be removed.');
+                            return;
+                        }
+                        </text>
+                    }
+                    
+                    const deleteBtn = document.getElementById('deleteBtn');
+                    if (deleteBtn) {
+                        deleteBtn.disabled = true;
+                        deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+                    }
+                    
+                    const redirectUrl = '@Url.Action("Index")';
+                    setTimeout(function() {
+                        history.replaceState(null, '', redirectUrl);
+                    }, 100);
+                });
+            }
+        })();
+    </script>
+}

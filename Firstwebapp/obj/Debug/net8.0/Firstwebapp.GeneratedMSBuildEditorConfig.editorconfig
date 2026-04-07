@@ -1,0 +1,191 @@
+is_global = true
+build_property.TargetFramework = net8.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = Firstwebapp
+build_property.RootNamespace = Firstwebapp
+build_property.ProjectDir = C:\Users\sarad\OneDrive\Desktop\WebAppMVC\WebappMVC-main\Firstwebapp\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 8.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = C:\Users\sarad\OneDrive\Desktop\WebAppMVC\WebappMVC-main\Firstwebapp
+build_property._RazorSourceGeneratorDebug = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/Auth/ForgotPassword.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXV0aFxGb3Jnb3RQYXNzd29yZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/Auth/ForgotPasswordConfirmation.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXV0aFxGb3Jnb3RQYXNzd29yZENvbmZpcm1hdGlvbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/Auth/Login.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXV0aFxMb2dpbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/Auth/Profile.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXV0aFxQcm9maWxlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/Auth/Register.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXV0aFxSZWdpc3Rlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/Auth/ResetPassword.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXV0aFxSZXNldFBhc3N3b3JkLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/Auth/TwoFactor.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXV0aFxUd29GYWN0b3IuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/Employee/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRW1wbG95ZWVcQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/Employee/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRW1wbG95ZWVcRGVsZXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/Employee/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRW1wbG95ZWVcRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/Employee/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRW1wbG95ZWVcRWRpdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/Employee/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRW1wbG95ZWVcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/ErrorViews/AccessDenied.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRXJyb3JWaWV3c1xBY2Nlc3NEZW5pZWQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/ErrorViews/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRXJyb3JWaWV3c1xFcnJvci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/ErrorViews/NotFound.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRXJyb3JWaWV3c1xOb3RGb3VuZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/ErrorViews/ServerError.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRXJyb3JWaWV3c1xTZXJ2ZXJFcnJvci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/Home/AccessDenied.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxBY2Nlc3NEZW5pZWQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/Home/Dashboard.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxEYXNoYm9hcmQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/Home/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/Home/Privacy.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/Job/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSm9iXENyZWF0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/Job/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSm9iXERlbGV0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/Job/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSm9iXERldGFpbHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/Job/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSm9iXEVkaXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/Job/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSm9iXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/Job/_AssignEmployeesPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSm9iXF9Bc3NpZ25FbXBsb3llZXNQYXJ0aWFsLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/Payroll/History.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGF5cm9sbFxIaXN0b3J5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/Payroll/Payslip.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGF5cm9sbFxQYXlzbGlwLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/Payroll/Statistics.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGF5cm9sbFxTdGF0aXN0aWNzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/Report/ContractorDetails.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVwb3J0XENvbnRyYWN0b3JEZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/Report/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVwb3J0XEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/Report/WorkerDetails.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVwb3J0XFdvcmtlckRldGFpbHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/Shared/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/Shared/_ValidationScriptsPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/User/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxEZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/User/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxFZGl0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/User/list.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxsaXN0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/User/Register.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxSZWdpc3Rlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/User/RegistrationSuccess.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxSZWdpc3RyYXRpb25TdWNjZXNzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/Wage/Calculator.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcV2FnZVxDYWxjdWxhdG9yLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/sarad/OneDrive/Desktop/WebAppMVC/WebappMVC-main/Firstwebapp/Views/Shared/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = b-6pkjgyzoq5

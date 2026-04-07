@@ -1,0 +1,256 @@
+@model Thekdar.ViewModels.PayslipViewModel
+@using Thekdar.Models
+@{
+    ViewData["Title"] = $"Payslip - {Model.PayslipNumber}";
+}
+
+<div class="container mt-4 mb-5">
+    <div class="d-flex justify-content-end gap-2 mb-3 no-print">
+        <button type="button" class="btn btn-primary" onclick="window.print()">
+            <i class="fas fa-print me-2"></i>Print
+        </button>
+        <a asp-action="History" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-lg">
+        <div class="card-header text-white" style="background: linear-gradient(135deg, #15315f 0%, #2c5aa0 100%);">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-8">
+                    <h3 class="mb-1">
+                        <i class="fas fa-file-invoice-dollar me-2"></i>Payslip
+                    </h3>
+                    <div class="small text-white-50">@Model.CompanyName</div>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <div class="fw-semibold">@Model.PayslipNumber</div>
+                    <div class="small text-white-50">Generated @Model.GeneratedDate.ToString("dd MMM yyyy hh:mm tt")</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body p-4">
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <div class="border rounded p-3 h-100">
+                        <h6 class="text-primary mb-3">Company</h6>
+                        <div class="fw-semibold">@Model.CompanyName</div>
+                        <div class="text-muted">@Model.CompanyAddress</div>
+                        <div class="text-muted">@Model.CompanyPhone</div>
+                        <div class="text-muted">@Model.CompanyEmail</div>
+                        <div class="small text-muted mt-2">PAN: @Model.CompanyPan</div>
+                        <div class="small text-muted">Registration: @Model.CompanyRegistration</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="border rounded p-3 h-100">
+                        <h6 class="text-primary mb-3">Worker</h6>
+                        <div class="fw-semibold">@Model.EmployeeName</div>
+                        <div class="text-muted">@Model.EmployeeTrade</div>
+                        <div class="text-muted">@Model.EmployeePhone</div>
+                        @if (!string.IsNullOrWhiteSpace(Model.EmployeePanNumber))
+                        {
+                            <div class="small text-muted mt-2">PAN: @Model.EmployeePanNumber</div>
+                        }
+                        <div class="small text-muted mt-2">Contractor: @Model.ContractorName</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <div class="border rounded p-3 h-100">
+                        <h6 class="text-primary mb-3">Pay Period</h6>
+                        <div class="d-flex justify-content-between py-1">
+                            <span class="text-muted">Start</span>
+                            <span>@Model.PeriodStart.ToString("dd MMM yyyy")</span>
+                        </div>
+                        <div class="d-flex justify-content-between py-1">
+                            <span class="text-muted">End</span>
+                            <span>@Model.PeriodEnd.ToString("dd MMM yyyy")</span>
+                        </div>
+                        <div class="d-flex justify-content-between py-1">
+                            <span class="text-muted">Days Worked</span>
+                            <span>@Model.DaysWorked</span>
+                        </div>
+                        <div class="d-flex justify-content-between py-1">
+                            <span class="text-muted">Daily Rate</span>
+                            <span>@Model.FormattedDailyRate</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="border rounded p-3 h-100">
+                        <h6 class="text-primary mb-3">Payment</h6>
+                        <div class="d-flex justify-content-between py-1">
+                            <span class="text-muted">Status</span>
+                            <span>
+                                @switch (Model.Status)
+                                {
+                                    case PaymentStatus.Paid:
+                                        <span class="badge bg-success">Paid</span>
+                                        break;
+                                    case PaymentStatus.Overdue:
+                                        <span class="badge bg-danger">Overdue</span>
+                                        break;
+                                    case PaymentStatus.PartiallyPaid:
+                                        <span class="badge bg-info text-dark">Partially Paid</span>
+                                        break;
+                                    default:
+                                        <span class="badge bg-warning text-dark">Pending</span>
+                                        break;
+                                }
+                            </span>
+                        </div>
+                        <div class="d-flex justify-content-between py-1">
+                            <span class="text-muted">Payment Date</span>
+                            <span>@Model.FormattedPaymentDate</span>
+                        </div>
+                        <div class="d-flex justify-content-between py-1">
+                            <span class="text-muted">Method</span>
+                            <span>@(Model.PaymentMethod ?? "-")</span>
+                        </div>
+                        <div class="d-flex justify-content-between py-1">
+                            <span class="text-muted">Reference</span>
+                            <span>@(Model.TransactionReference ?? "-")</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-lg-7">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-header bg-success text-white">
+                            <h6 class="mb-0">Earnings</h6>
+                        </div>
+                        <div class="card-body p-0">
+                            <table class="table mb-0">
+                                <tbody>
+                                    <tr>
+                                        <td>Base wage (@Model.DaysWorked day(s) x NPR @Model.DailyRate.ToString("N0"))</td>
+                                        <td class="text-end">@Model.BaseWage.ToString("N2")</td>
+                                    </tr>
+                                    @if (Model.OvertimeHours > 0)
+                                    {
+                                        <tr>
+                                            <td>Overtime (@Model.OvertimeHours hour(s) x @Model.OvertimeMultiplier)</td>
+                                            <td class="text-end">@Model.OvertimeWage.ToString("N2")</td>
+                                        </tr>
+                                    }
+                                    @if (Model.Bonus > 0)
+                                    {
+                                        <tr>
+                                            <td>Bonus @(string.IsNullOrWhiteSpace(Model.BonusReason) ? string.Empty : $"({Model.BonusReason})")</td>
+                                            <td class="text-end text-success">+ @Model.Bonus.ToString("N2")</td>
+                                        </tr>
+                                    }
+                                    <tr class="table-light fw-semibold">
+                                        <td>Total earnings</td>
+                                        <td class="text-end">@Model.TotalWage.ToString("N2")</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-header bg-danger text-white">
+                            <h6 class="mb-0">Deductions</h6>
+                        </div>
+                        <div class="card-body p-0">
+                            <table class="table mb-0">
+                                <tbody>
+                                    @if (Model.Deduction > 0)
+                                    {
+                                        <tr>
+                                            <td>@(Model.DeductionReason ?? "Deduction")</td>
+                                            <td class="text-end text-danger">- @Model.Deduction.ToString("N2")</td>
+                                        </tr>
+                                    }
+                                    @if (Model.SsfContribution > 0)
+                                    {
+                                        <tr>
+                                            <td>SSF Contribution</td>
+                                            <td class="text-end text-danger">- @Model.SsfContribution.ToString("N2")</td>
+                                        </tr>
+                                    }
+                                    @if (Model.CitContribution > 0)
+                                    {
+                                        <tr>
+                                            <td>CIT Contribution</td>
+                                            <td class="text-end text-danger">- @Model.CitContribution.ToString("N2")</td>
+                                        </tr>
+                                    }
+                                    @if (Model.VatAmount > 0)
+                                    {
+                                        <tr>
+                                            <td>VAT</td>
+                                            <td class="text-end text-danger">- @Model.VatAmount.ToString("N2")</td>
+                                        </tr>
+                                    }
+                                    @if (Model.TotalDeductions == 0)
+                                    {
+                                        <tr>
+                                            <td colspan="2" class="text-center text-muted py-4">No deductions applied.</td>
+                                        </tr>
+                                    }
+                                    <tr class="table-light fw-semibold">
+                                        <td>Total deductions</td>
+                                        <td class="text-end">@Model.TotalDeductions.ToString("N2")</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="rounded p-4 text-white mb-4" style="background: linear-gradient(135deg, #0f9b8e 0%, #38c172 100%);">
+                <div class="row g-3 align-items-center">
+                    <div class="col-md-4">
+                        <div class="small text-white-50">Amount in words</div>
+                        <div>@Model.NetPayableInWords</div>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="small text-white-50">Net Payable</div>
+                        <div class="display-6 fw-bold">NPR @Model.NetPayable.ToString("N2")</div>
+                    </div>
+                    <div class="col-md-4 text-md-end">
+                        <div class="small text-white-50">Notes</div>
+                        <div>@(string.IsNullOrWhiteSpace(Model.Notes) ? "-" : Model.Notes)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center small text-muted border-top pt-3">
+                This is a system-generated payslip. Contact accounts within 7 days if any detail is incorrect.
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @@media print {
+        .no-print {
+            display: none !important;
+        }
+
+        body {
+            background: #fff !important;
+        }
+
+        .card,
+        .shadow-sm,
+        .shadow-lg {
+            box-shadow: none !important;
+        }
+
+        .container {
+            max-width: 100% !important;
+            padding: 0 !important;
+        }
+    }
+</style>

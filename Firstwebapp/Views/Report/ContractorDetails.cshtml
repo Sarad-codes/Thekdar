@@ -1,0 +1,334 @@
+﻿@model Thekdar.Models.UserModel
+@using Thekdar.Models
+@{
+    ViewData["Title"] = $"Contractor Dashboard - {Model.Name}";
+    Layout = "_Layout";
+}
+
+<div class="container mt-4">
+    <!-- Back Button -->
+    <div class="mb-3">
+        <a asp-action="Index" asp-route-tab="contractors" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back to Reports
+        </a>
+    </div>
+
+    <!-- Profile Card -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-8">
+                    <h2 class="mb-2">
+                        <i class="fas fa-hard-hat text-primary me-2"></i>@Model.Name
+                    </h2>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <p class="mb-2"><i class="fas fa-envelope text-muted me-2"></i>@Model.Email</p>
+                            <p class="mb-2"><i class="fas fa-phone text-muted me-2"></i>@Model.Phone</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-2"><i class="fas fa-calendar-alt text-muted me-2"></i>Joined: @Model.CreatedAt.ToString("MMM dd, yyyy")</p>
+                            <p class="mb-2">
+                                <i class="fas fa-circle text-muted me-2"></i>Status:
+                                @if (Model.Status == UserStatus.Active)
+                                {
+                                    <span class="badge bg-success">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Inactive</span>
+                                }
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 text-end">
+                    <div class="bg-light rounded p-3 d-inline-block">
+                        <i class="fas fa-building fa-3x text-primary"></i>
+                        <p class="mb-0 mt-2 small text-muted">Contractor</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3 col-6">
+            <div class="card border-0 shadow-sm text-center p-3">
+                <i class="fas fa-users fa-2x text-primary mb-2"></i>
+                <h3 id="totalWorkers">-</h3>
+                <small class="text-muted">Total Workers</small>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card border-0 shadow-sm text-center p-3">
+                <i class="fas fa-briefcase fa-2x text-info mb-2"></i>
+                <h3 id="totalJobs">-</h3>
+                <small class="text-muted">Total Jobs</small>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card border-0 shadow-sm text-center p-3">
+                <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                <h3 id="completedJobs">-</h3>
+                <small class="text-muted">Completed Jobs</small>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card border-0 shadow-sm text-center p-3">
+                <i class="fas fa-clock fa-2x text-warning mb-2"></i>
+                <h3 id="pendingJobs">-</h3>
+                <small class="text-muted">Pending Jobs</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Workers Table -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white">
+            <h5><i class="fas fa-users me-2 text-primary"></i>Workers Under This Contractor</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Name</th>
+                            <th>Trade</th>
+                            <th>Phone</th>
+                            <th>Daily Rate</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="workersTableBody">
+                        <tr><td colspan="6" class="text-center">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Jobs Table -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white">
+            <h5><i class="fas fa-briefcase me-2 text-primary"></i>Recent Jobs</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Title</th>
+                            <th>Client</th>
+                            <th>Scheduled</th>
+                            <th>Status</th>
+                            <th>Workers</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="jobsTableBody">
+                        <tr><td colspan="6" class="text-center">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payroll Summary -->
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white">
+            <h5><i class="fas fa-money-bill-wave me-2 text-success"></i>Recent Payroll</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Worker</th>
+                            <th>Period</th>
+                            <th>Days</th>
+                            <th>Net Payable</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="payrollTableBody">
+                        <tr><td colspan="6" class="text-center">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+<script>
+    const contractorId = '@Model.Id';
+
+    $(document).ready(function () {
+        loadDashboardData();
+    });
+
+    function loadDashboardData() {
+        $.ajax({
+            url: `/Report/GetContractorDashboardData/${contractorId}`,
+            type: 'GET',
+            success: function (response) {
+                if (response.success) {
+                    $('#totalWorkers').text(response.totalWorkers);
+                    $('#totalJobs').text(response.totalJobs);
+                    $('#completedJobs').text(response.completedJobs);
+                    $('#pendingJobs').text(response.pendingJobs);
+
+                    renderWorkersTable(response.workers);
+                    renderJobsTable(response.jobs);
+                    renderPayrollTable(response.payrolls);
+                    return;
+                }
+
+                showAlert(response.message || 'Error loading dashboard data', 'danger');
+            },
+            error: function () {
+                showAlert('Error loading dashboard data', 'danger');
+            }
+        });
+    }
+
+    function renderWorkersTable(workers) {
+        if (!workers || workers.length === 0) {
+            $('#workersTableBody').html('<tr><td colspan="6" class="text-center text-muted">No workers found</td></tr>');
+            return;
+        }
+
+        let html = '';
+        workers.forEach(w => {
+            const statusBadge = w.isAvailable
+                ? '<span class="badge bg-success">Available</span>'
+                : '<span class="badge bg-secondary">Unavailable</span>';
+
+            html += `<tr>
+                        <td class="fw-semibold">${escapeHtml(w.fullName)}</td>
+                        <td>${escapeHtml(w.trade || '-')}</td>
+                        <td>${escapeHtml(w.phone || '-')}</td>
+                        <td>NPR ${formatNumber(w.dailyRate)}</td>
+                        <td>${statusBadge}</td>
+                        <td>
+                            <a href="/Report/WorkerDetails/${w.id}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>`;
+        });
+
+        $('#workersTableBody').html(html);
+    }
+
+    function renderJobsTable(jobs) {
+        if (!jobs || jobs.length === 0) {
+            $('#jobsTableBody').html('<tr><td colspan="6" class="text-center text-muted">No jobs found</td></tr>');
+            return;
+        }
+
+        let html = '';
+        jobs.forEach(j => {
+            const statusClass = getJobStatusClass(j.status);
+
+            html += `<tr>
+                        <td class="fw-semibold">${escapeHtml(j.title)}</td>
+                        <td>${escapeHtml(j.clientName || '-')}</td>
+                        <td>${formatDate(j.scheduledDate)}</td>
+                        <td><span class="badge ${statusClass}">${escapeHtml(j.status)}</span></td>
+                        <td>${j.workersAssigned}</td>
+                        <td>
+                            <a href="/Job/Details/${j.id}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>`;
+        });
+
+        $('#jobsTableBody').html(html);
+    }
+
+    function renderPayrollTable(payrolls) {
+        if (!payrolls || payrolls.length === 0) {
+            $('#payrollTableBody').html('<tr><td colspan="6" class="text-center text-muted">No payroll records</td></tr>');
+            return;
+        }
+
+        let html = '';
+        payrolls.forEach(p => {
+            const statusBadge = p.status === 'Paid'
+                ? '<span class="badge bg-success">Paid</span>'
+                : '<span class="badge bg-warning text-dark">Pending</span>';
+
+            html += `<tr>
+                        <td class="fw-semibold">${escapeHtml(p.employeeName || '-')}</td>
+                        <td>${escapeHtml(p.period || '-')}</td>
+                        <td>${p.daysWorked}</td>
+                        <td class="text-success fw-semibold">NPR ${formatNumber(p.netPayable)}</td>
+                        <td>${statusBadge}</td>
+                        <td>
+                            <a href="/Payroll/Payslip/${p.id}" target="_blank" class="btn btn-sm btn-outline-info">
+                                <i class="fas fa-file-invoice"></i>
+                            </a>
+                        </td>
+                    </tr>`;
+        });
+
+        $('#payrollTableBody').html(html);
+    }
+
+    function getJobStatusClass(status) {
+        switch (status) {
+            case 'Completed':
+                return 'bg-success';
+            case 'Active':
+                return 'bg-primary';
+            case 'PendingConfirmation':
+                return 'bg-warning text-dark';
+            default:
+                return 'bg-secondary';
+        }
+    }
+
+    function formatDate(value) {
+        if (!value) return '-';
+
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) {
+            return escapeHtml(value);
+        }
+
+        return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: '2-digit'
+        });
+    }
+
+    function formatNumber(num) {
+        const parsed = Number(num);
+        if (Number.isNaN(parsed)) return '0';
+        return parsed.toLocaleString('en-US', { maximumFractionDigits: 0 });
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    function showAlert(message, type) {
+        const alertDiv = $(`<div class="alert alert-${type} alert-dismissible fade show">${escapeHtml(message)}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`);
+        $('.container').prepend(alertDiv);
+        setTimeout(() => alertDiv.fadeOut(3000), 5000);
+    }
+</script>
+}

@@ -1,0 +1,753 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>@ViewData["Title"] - Thekdar</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="~/Thekdar.styles.css" asp-append-version="true"/>
+
+    <style>
+        :root {
+            --sidebar-width: 260px;
+            --sidebar-collapsed: 70px;
+            --bg: #f4f6fb;
+            --sidebar-bg: #0f172a;
+            --sidebar-hover: #1e293b;
+            --sidebar-active: #3b82f6;
+            --sidebar-text: #94a3b8;
+            --sidebar-text-active: #ffffff;
+            --accent: #3b82f6;
+            --accent2: #6366f1;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --radius: 14px;
+            --shadow: 0 2px 16px rgba(15,23,42,0.08);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ── SIDEBAR ── */
+        #sidebar {
+            width: var(--sidebar-width);
+            min-height: 100vh;
+            background: var(--sidebar-bg);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            left: 0; top: 0; bottom: 0;
+            z-index: 100;
+            transition: width 0.3s cubic-bezier(.4,0,.2,1);
+            overflow: hidden;
+        }
+
+        #sidebar.collapsed { width: var(--sidebar-collapsed); }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 24px 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            white-space: nowrap;
+            overflow: hidden;
+            text-decoration: none;
+        }
+
+        .sidebar-brand .brand-icon {
+            width: 36px; height: 36px;
+            background: var(--accent);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            font-size: 16px; color: white;
+        }
+
+        .sidebar-brand .brand-text {
+            font-size: 17px; font-weight: 700;
+            color: white; letter-spacing: -0.3px;
+            opacity: 1; transition: opacity 0.2s;
+        }
+
+        #sidebar.collapsed .brand-text { opacity: 0; }
+
+        /* Nav sections */
+        .sidebar-nav {
+            flex: 1;
+            padding: 16px 10px;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .nav-section-label {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: #475569;
+            padding: 12px 12px 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            transition: opacity 0.2s;
+        }
+
+        #sidebar.collapsed .nav-section-label { opacity: 0; }
+
+        .nav-item-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            color: var(--sidebar-text);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            white-space: nowrap;
+            transition: background 0.15s, color 0.15s;
+            position: relative;
+            margin-bottom: 2px;
+        }
+
+        .nav-item-link:hover {
+            background: var(--sidebar-hover);
+            color: white;
+        }
+
+        .nav-item-link.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .nav-item-link .nav-icon {
+            width: 20px; text-align: center;
+            flex-shrink: 0; font-size: 15px;
+        }
+
+        .nav-item-link .nav-label {
+            opacity: 1; transition: opacity 0.2s;
+            flex: 1;
+        }
+
+        #sidebar.collapsed .nav-label { opacity: 0; }
+
+        .nav-badge {
+            background: var(--accent);
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 20px;
+            margin-left: auto;
+        }
+
+        .nav-badge-soon {
+            background: #f59e0b;
+            color: white;
+            font-size: 9px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 20px;
+            margin-left: auto;
+        }
+
+        #sidebar.collapsed .nav-badge, 
+        #sidebar.collapsed .nav-badge-soon { display: none; }
+
+        /* Tooltip when collapsed */
+        #sidebar.collapsed .nav-item-link::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: calc(var(--sidebar-collapsed) + 8px);
+            background: #1e293b;
+            color: white;
+            font-size: 13px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s;
+            z-index: 999;
+        }
+
+        #sidebar.collapsed .nav-item-link:hover::after { opacity: 1; }
+
+        /* Sidebar footer */
+        .sidebar-footer {
+            padding: 16px 10px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .sidebar-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.05);
+            overflow: hidden;
+        }
+
+        .user-avatar {
+            width: 34px; height: 34px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 700; font-size: 13px;
+            flex-shrink: 0;
+        }
+
+        .user-info { overflow: hidden; transition: opacity 0.2s; }
+        .user-name { color: white; font-size: 13px; font-weight: 600; white-space: nowrap; }
+        .user-role { color: var(--sidebar-text); font-size: 11px; white-space: nowrap; }
+        #sidebar.collapsed .user-info { opacity: 0; }
+
+        /* Toggle button */
+        #sidebarToggle {
+            position: fixed;
+            top: 18px;
+            left: calc(var(--sidebar-width) - 16px);
+            z-index: 200;
+            width: 32px; height: 32px;
+            background: white;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: left 0.3s cubic-bezier(.4,0,.2,1), transform 0.3s;
+            box-shadow: var(--shadow);
+            color: var(--text-muted);
+        }
+
+        #sidebarToggle.collapsed { left: calc(var(--sidebar-collapsed) - 16px); }
+        #sidebarToggle:hover { background: var(--accent); color: white; border-color: var(--accent); }
+
+        /* ── MAIN CONTENT ── */
+        #main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            transition: margin-left 0.3s cubic-bezier(.4,0,.2,1);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #main-content.landing-page {
+            margin-left: 0;
+        }
+
+        #main-content.expanded {
+            margin-left: var(--sidebar-collapsed);
+        }
+
+        /* Top bar */
+        .topbar {
+            background: white;
+            border-bottom: 1px solid #e9eef5;
+            padding: 14px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky; top: 0; z-index: 50;
+        }
+
+        .topbar-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .topbar-actions { display: flex; align-items: center; gap: 12px; }
+
+        .topbar-btn {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            border: 1.5px solid #e2e8f0;
+            background: white;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.15s;
+            text-decoration: none;
+        }
+
+        .topbar-btn:hover { background: var(--accent); color: white; border-color: var(--accent); }
+
+        .topbar-profile {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px 6px 6px;
+            border-radius: 10px;
+            border: 1.5px solid #e2e8f0;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--text-main);
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.15s;
+            position: relative;
+        }
+
+        .topbar-profile:hover { border-color: var(--accent); }
+
+        .topbar-avatar {
+            width: 28px; height: 28px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 11px; font-weight: 700;
+        }
+
+        /* Dropdown */
+        .profile-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: white;
+            border: 1.5px solid #e2e8f0;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            min-width: 180px;
+            padding: 8px;
+            display: none;
+            z-index: 999;
+        }
+
+        .topbar-profile:focus .profile-dropdown,
+        .topbar-profile.open .profile-dropdown { display: block; }
+
+        .dropdown-link {
+            display: flex; align-items: center; gap: 8px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 13px;
+            text-decoration: none;
+            transition: background 0.1s;
+        }
+
+        .dropdown-link:hover { background: var(--bg); }
+        .dropdown-link.danger { color: #ef4444; }
+        .dropdown-divider { border-top: 1px solid #f1f5f9; margin: 6px 0; }
+
+        /* Page content */
+        .page-content {
+            padding: 28px;
+            flex: 1;
+        }
+
+        /* Alerts */
+        .alert { border-radius: var(--radius); border: none; }
+
+        /* Mobile overlay */
+        #sidebar-overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 99;
+        }
+
+        @@media (max-width: 768px) {
+            #sidebar {
+                width: var(--sidebar-width) !important;
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+            #sidebar.mobile-open { transform: translateX(0); }
+            #main-content { margin-left: 0 !important; }
+            #sidebarToggle { left: 16px !important; }
+            #sidebar-overlay.active { display: block; }
+        }
+    </style>
+</head>
+<body>
+
+@{
+var isLandingPage = ViewContext.RouteData.Values["action"]?.ToString() == "Index" &&
+ViewContext.RouteData.Values["controller"]?.ToString() == "Home";
+}
+
+@if (!isLandingPage)
+{
+@* ── SIDEBAR ── *@
+<aside id="sidebar">
+    <a class="sidebar-brand" asp-controller="Home" asp-action="Index">
+        <div class="brand-icon"><i class="fas fa-hard-hat"></i></div>
+        <span class="brand-text">Thekdar</span>
+    </a>
+
+    <nav class="sidebar-nav">
+
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <div class="nav-section-label">Main</div>
+
+            <a class="nav-item-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard" ? "active" : "")"
+               asp-controller="Home" asp-action="Dashboard" data-tooltip="Dashboard">
+                <span class="nav-icon"><i class="fas fa-th-large"></i></span>
+                <span class="nav-label">Dashboard</span>
+            </a>
+
+            <a class="nav-item-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Job" ? "active" : "")"
+               asp-controller="Job" asp-action="Index" data-tooltip="Jobs">
+                <span class="nav-icon"><i class="fas fa-briefcase"></i></span>
+                <span class="nav-label">Jobs</span>
+            </a>
+
+            <a class="nav-item-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Employee" ? "active" : "")"
+               asp-controller="Employee" asp-action="Index" data-tooltip="Workers">
+                <span class="nav-icon"><i class="fas fa-users"></i></span>
+                <span class="nav-label">Workers</span>
+            </a>
+
+            <a class="nav-item-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Report" ? "active" : "")"
+               asp-controller="Report" asp-action="Index" data-tooltip="Reports">
+                <span class="nav-icon"><i class="fas fa-chart-bar"></i></span>
+                <span class="nav-label">Reports</span>
+            </a>
+
+            <!-- PAYROLL SECTION -->
+            <div class="nav-section-label">Payroll</div>
+
+            <a class="nav-item-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Wage" && ViewContext.RouteData.Values["action"]?.ToString() == "Calculator" ? "active" : "")"
+               asp-controller="Wage" asp-action="Calculator" data-tooltip="Wage Calculator">
+                <span class="nav-icon"><i class="fas fa-calculator"></i></span>
+                <span class="nav-label">Wage Calculator</span>
+            </a>
+
+            <a class="nav-item-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Payroll" && ViewContext.RouteData.Values["action"]?.ToString() == "History" ? "active" : "")"
+               asp-controller="Payroll" asp-action="History" data-tooltip="Payroll History">
+                <span class="nav-icon"><i class="fas fa-history"></i></span>
+                <span class="nav-label">Payroll History</span>
+            </a>
+
+            <a class="nav-item-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Payroll" && ViewContext.RouteData.Values["action"]?.ToString() == "Statistics" ? "active" : "")"
+               asp-controller="Payroll" asp-action="Statistics" data-tooltip="Statistics">
+                <span class="nav-icon"><i class="fas fa-chart-pie"></i></span>
+                <span class="nav-label">Statistics</span>
+            </a>
+
+            @if (User.IsInRole("Admin"))
+            {
+                <div class="nav-section-label">Admin</div>
+
+                <a class="nav-item-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "User" ? "active" : "")"
+                   asp-controller="User" asp-action="List" data-tooltip="Contractors">
+                    <span class="nav-icon"><i class="fas fa-user-tie"></i></span>
+                    <span class="nav-label">Contractors</span>
+                </a>
+
+                <a class="nav-item-link"
+                   asp-controller="User" asp-action="Register" data-tooltip="Add Contractor">
+                    <span class="nav-icon"><i class="fas fa-user-plus"></i></span>
+                    <span class="nav-label">Add Contractor</span>
+                </a>
+
+                <a class="nav-item-link"
+                   asp-controller="Employee" asp-action="Create" data-tooltip="Add Worker">
+                    <span class="nav-icon"><i class="fas fa-user-plus"></i></span>
+                    <span class="nav-label">Add Worker</span>
+                </a>
+            }
+
+            <div class="nav-section-label">Actions</div>
+
+            <a class="nav-item-link"
+               asp-controller="Job" asp-action="Create" data-tooltip="New Job">
+                <span class="nav-icon"><i class="fas fa-plus-circle"></i></span>
+                <span class="nav-label">New Job</span>
+            </a>
+
+            <div class="nav-section-label">Coming Soon</div>
+
+            <a class="nav-item-link" href="#" data-tooltip="Invoices"
+               onclick="showComingSoon(); return false;" style="opacity:0.85;">
+                <span class="nav-icon"><i class="fas fa-file-invoice-dollar"></i></span>
+                <span class="nav-label">Invoices</span>
+                <span class="nav-badge-soon">Soon</span>
+            </a>
+
+            <a class="nav-item-link" href="#" data-tooltip="Schedule"
+               onclick="showComingSoon(); return false;" style="opacity:0.85;">
+                <span class="nav-icon"><i class="fas fa-calendar-alt"></i></span>
+                <span class="nav-label">Schedule</span>
+                <span class="nav-badge-soon">Soon</span>
+            </a>
+
+            <a class="nav-item-link" href="#" data-tooltip="Messages"
+               onclick="showComingSoon(); return false;" style="opacity:0.85;">
+                <span class="nav-icon"><i class="fas fa-comments"></i></span>
+                <span class="nav-label">Messages</span>
+                <span class="nav-badge-soon">Soon</span>
+            </a>
+        }
+        else
+        {
+            <a class="nav-item-link" asp-controller="Auth" asp-action="Login" data-tooltip="Login">
+                <span class="nav-icon"><i class="fas fa-sign-in-alt"></i></span>
+                <span class="nav-label">Login</span>
+            </a>
+            <a class="nav-item-link" asp-controller="Auth" asp-action="Register" data-tooltip="Register">
+                <span class="nav-icon"><i class="fas fa-user-plus"></i></span>
+                <span class="nav-label">Register</span>
+            </a>
+        }
+
+    </nav>
+
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+    <div class="sidebar-footer">
+        <div class="sidebar-user">
+            <div class="user-avatar">
+                @(User.Identity.Name?.Substring(0, 1).ToUpper() ?? "U")
+            </div>
+            <div class="user-info">
+                <div class="user-name">@User.Identity.Name</div>
+                <div class="user-role">
+                    @(User.IsInRole("Admin") ? "Administrator" : "Contractor")
+                </div>
+            </div>
+        </div>
+    </div>
+    }
+</aside>
+
+@* Toggle button *@
+<button id="sidebarToggle" title="Toggle sidebar">
+    <i class="fas fa-chevron-left" id="toggleIcon"></i>
+</button>
+
+@* Mobile overlay *@
+<div id="sidebar-overlay"></div>
+}
+
+@* ── MAIN CONTENT ── *@
+<div id="main-content" class="@(isLandingPage ? "landing-page" : "")">
+
+    @* Top bar *@
+    <div class="topbar">
+        <div class="topbar-title">@(ViewData["Title"] ?? "Thekdar")</div>
+
+        <div class="topbar-actions">
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                @if (User.IsInRole("Admin") || User.IsInRole("Contractor"))
+                {
+                    <a asp-controller="Job" asp-action="Create" class="topbar-btn" title="New Job">
+                        <i class="fas fa-plus"></i>
+                    </a>
+                    <a asp-controller="Wage" asp-action="Calculator" class="topbar-btn" title="Wage Calculator">
+                        <i class="fas fa-calculator"></i>
+                    </a>
+                }
+
+                <!-- Back Button -->
+                <button id="backButton" class="topbar-btn" style="display: none;" onclick="history.back()" title="Go Back">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+
+                <div class="topbar-profile" id="profileBtn" tabindex="0">
+                    <div class="topbar-avatar">
+                        @(User.Identity.Name?.Substring(0, 1).ToUpper() ?? "U")
+                    </div>
+                    @User.Identity.Name
+                    <i class="fas fa-chevron-down" style="font-size:10px; color:#94a3b8;"></i>
+
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <a class="dropdown-link" asp-controller="Auth" asp-action="Profile">
+                            <i class="fas fa-id-card"></i> My Profile
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <form asp-controller="Auth" asp-action="Logout" method="post">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="dropdown-link danger w-100"
+                                    style="border:none; background:none; text-align:left; cursor:pointer;">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <a asp-controller="Auth" asp-action="Login" class="topbar-btn" title="Login">
+                    <i class="fas fa-sign-in-alt"></i>
+                </a>
+            }
+        </div>
+    </div>
+
+    @* Alerts *@
+    @if (TempData["Success"] != null)
+    {
+        <div style="padding: 0 28px; padding-top: 20px;">
+            <div class="alert alert-success alert-dismissible fade show shadow-sm">
+                <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div style="padding: 0 28px; padding-top: 20px;">
+            <div class="alert alert-danger alert-dismissible fade show shadow-sm">
+                <i class="fas fa-exclamation-circle me-2"></i>@TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        </div>
+    }
+
+    <div class="page-content">
+        @RenderBody()
+    </div>
+
+    <footer style="padding: 16px 28px; border-top: 1px solid #e9eef5; color: #94a3b8; font-size: 12px;">
+        &copy; 2026 Thekdar &mdash; <a asp-controller="Home" asp-action="Privacy" style="color:#94a3b8;">Privacy</a>
+    </footer>
+</div>
+
+<!-- Coming Soon Modal -->
+<div class="modal fade" id="comingSoonModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title">
+                    <i class="fas fa-clock me-2"></i>Coming Soon!
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center py-4">
+                <i class="fas fa-file-invoice-dollar fa-4x text-warning mb-3"></i>
+                <h5>Feature in Development</h5>
+                <p class="text-muted">
+                    We're working hard to bring you this feature soon!
+                </p>
+                <hr />
+                <div class="text-start small text-muted">
+                    <i class="fas fa-check-circle text-success me-1"></i> Invoicing System<br />
+                    <i class="fas fa-check-circle text-success me-1"></i> Payment Integration<br />
+                    <i class="fas fa-check-circle text-success me-1"></i> Client Management<br />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Got it</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+
+<script>
+    // Coming Soon Modal
+    function showComingSoon() {
+        new bootstrap.Modal(document.getElementById('comingSoonModal')).show();
+    }
+
+    // Sidebar functionality
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('main-content');
+    const toggleBtn = document.getElementById('sidebarToggle');
+    const toggleIcon = document.getElementById('toggleIcon');
+    const overlay = document.getElementById('sidebar-overlay');
+    const isMobile = () => window.innerWidth <= 768;
+
+    if (sidebar) {
+        // Restore state
+        if (!isMobile() && localStorage.getItem('sidebarCollapsed') === 'true') {
+            sidebar.classList.add('collapsed');
+            mainContent.classList.add('expanded');
+            toggleBtn.classList.add('collapsed');
+            toggleIcon.classList.replace('fa-chevron-left', 'fa-chevron-right');
+        }
+
+        toggleBtn.addEventListener('click', () => {
+            if (isMobile()) {
+                sidebar.classList.toggle('mobile-open');
+                overlay.classList.toggle('active');
+            } else {
+                const collapsed = sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('expanded', collapsed);
+                toggleBtn.classList.toggle('collapsed', collapsed);
+                toggleIcon.classList.replace(
+                    collapsed ? 'fa-chevron-left' : 'fa-chevron-right',
+                    collapsed ? 'fa-chevron-right' : 'fa-chevron-left'
+                );
+                localStorage.setItem('sidebarCollapsed', collapsed);
+            }
+        });
+
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('mobile-open');
+            overlay.classList.remove('active');
+        });
+    }
+
+    // Profile dropdown toggle
+    const profileBtn = document.getElementById('profileBtn');
+    const profileDropdown = document.getElementById('profileDropdown');
+    if (profileBtn) {
+        profileBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            profileBtn.classList.toggle('open');
+        });
+        document.addEventListener('click', () => profileBtn.classList.remove('open'));
+    }
+
+    // Password visibility toggle
+    function togglePassword(inputId, button) {
+        const input = document.getElementById(inputId);
+        const icon = button.querySelector('i');
+
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+
+    // Show back button if there's history to go back to
+    const backButton = document.getElementById('backButton');
+    if (backButton && window.history.length > 1) {
+        backButton.style.display = 'inline-flex';
+    }
+
+    // Anti-forgery token for AJAX requests
+    @{
+        var token = Context.Request.Headers["RequestVerificationToken"].FirstOrDefault() ?? 
+                    Context.Request.Cookies["__RequestVerificationToken"];
+    }
+    if (typeof $ !== 'undefined') {
+        $.ajaxSetup({
+            headers: {
+                'RequestVerificationToken': '@token'
+            }
+        });
+    }
+</script>
+
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

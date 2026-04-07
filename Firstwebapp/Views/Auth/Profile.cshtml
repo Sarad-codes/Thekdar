@@ -1,0 +1,247 @@
+﻿@model Thekdar.ViewModels.UserProfileViewModel
+@using Thekdar.Models
+
+@{
+ViewData["Title"] = "My Profile";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-id-card me-2"></i>My Profile</h4>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <div class="position-relative d-inline-block">
+                            <img id="profilePreview"
+                                 src="@(Model.ProfilePicture != null ? $"data:{Model.ProfilePictureContentType};base64,{Convert.ToBase64String(Model.ProfilePicture)}" : "https://via.placeholder.com/100?text=No+Image")"
+                                 alt="@Model.Name"
+                                 class="rounded-circle"
+                                 role="button"
+                                 tabindex="0"
+                                 aria-label="View profile picture larger"
+                                 title="Click to enlarge"
+                                 style="width: 100px; height: 100px; object-fit: cover; border: 3px solid #3b82f6; cursor: pointer;" />
+                            <button type="button" id="removePictureBtn" class="btn btn-sm btn-danger position-absolute bottom-0 end-0 rounded-circle"
+                                    style="width: 28px; height: 28px; padding: 0; display: @(Model.ProfilePicture != null ? "inline-flex" : "none"); align-items: center; justify-content: center;"
+                                    title="Remove picture">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <h3 class="mt-3 mb-1">@Model.Name</h3>
+
+                        @if (Model.Role == UserRole.Admin)
+                        {
+                        <span class="badge bg-danger px-3 py-2">
+                                <i class="fas fa-crown me-1"></i>Admin
+                            </span>
+                        }
+                        else
+                        {
+                        <span class="badge bg-primary px-3 py-2">
+                                <i class="fas fa-hard-hat me-1"></i>Contractor
+                            </span>
+                        }
+                    </div>
+
+                    <table class="table table-bordered">
+                        <tr>
+                            <th class="bg-light" style="width:40%">
+                                <i class="fas fa-envelope me-2 text-muted"></i>Email
+                            </th>
+                            <td class="fw-semibold">@Model.Email</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">
+                                <i class="fas fa-phone me-2 text-muted"></i>Phone
+                            </th>
+                            <td class="fw-semibold">@Model.Phone</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">
+                                <i class="fas fa-calendar-alt me-2 text-muted"></i>Age
+                            </th>
+                            <td class="fw-semibold">@Model.Age</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">
+                                <i class="fas fa-shield-alt me-2 text-muted"></i>Status
+                            </th>
+                            <td>
+                                @if (Model.Status == UserStatus.Active)
+                                {
+                                <span class="badge bg-success">Active</span>
+                                }
+                                else
+                                {
+                                <span class="badge bg-secondary">Inactive</span>
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">
+                                <i class="fas fa-clock me-2 text-muted"></i>Joined
+                            </th>
+                            <td class="fw-semibold">@Model.CreatedAt.ToString("MMM dd, yyyy")</td>
+                        </tr>
+                    </table>
+
+                    <!-- Update Profile Picture Form -->
+                    <form asp-action="UpdateProfilePicture" method="post" enctype="multipart/form-data" id="profilePictureForm">
+                        @Html.AntiForgeryToken()
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">
+                                <i class="fas fa-camera me-2"></i>Update Profile Picture
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-image"></i></span>
+                                <input type="file" name="profilePicture" id="profilePictureInput" class="form-control" accept="image/*" />
+                            </div>
+                            <small class="text-muted">Upload a new profile picture (jpg, png, etc.)</small>
+                        </div>
+                        <div id="previewContainer" class="mb-3 text-center" style="display: none;">
+                            <label class="form-label fw-semibold">Preview:</label>
+                            <div>
+                                <img id="imagePreview" src="#" alt="Preview" class="rounded-circle" style="width: 80px; height: 80px; object-fit: cover; border: 2px solid #3b82f6;" />
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 mb-2" id="updatePictureBtn">
+                            <i class="fas fa-upload me-2"></i>Update Picture
+                        </button>
+                    </form>
+
+                    <!-- Remove Picture Form -->
+                    <form asp-action="RemoveProfilePicture" method="post" id="removePictureForm" style="display: inline;">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-outline-danger w-100 mb-2" id="removePictureFormBtn" style="display: @(Model.ProfilePicture != null ? "block" : "none");">
+                            <i class="fas fa-trash-alt me-2"></i>Remove Picture
+                        </button>
+                    </form>
+
+                    <!-- 2FA Section -->
+                    <hr />
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <i class="fas fa-shield-alt me-2 text-primary"></i>
+                            <strong>Two-Factor Authentication</strong>
+                            <p class="text-muted small mb-0">Add an extra layer of security to your account</p>
+                        </div>
+                        @if (Model.TwoFactorEnabled)
+                        {
+                        <form asp-action="DisableTwoFactor" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-sm btn-outline-danger"
+                                    onclick="return confirm('Disable 2FA? Your account will be less secure.')">
+                                <i class="fas fa-toggle-off me-1"></i>Disable
+                            </button>
+                        </form>
+                        }
+                        else
+                        {
+                        <form asp-action="EnableTwoFactor" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-toggle-on me-1"></i>Enable
+                            </button>
+                        </form>
+                        }
+                    </div>
+                    @if (Model.TwoFactorEnabled)
+                    {
+                    <div class="alert alert-success py-2 mb-3">
+                        <i class="fas fa-check-circle me-2"></i>
+                        2FA is <strong>enabled</strong>. You will be prompted for a code on next login.
+                    </div>
+                    }
+                    else
+                    {
+                    <div class="alert alert-warning py-2 mb-3">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        2FA is <strong>disabled</strong>. Enable it to secure your account.
+                    </div>
+                    }
+
+                    <a asp-controller="Home" asp-action="Dashboard" class="btn btn-outline-secondary w-100">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Enlarged profile picture -->
+<div class="modal fade" id="profilePictureEnlargeModal" tabindex="-1" aria-labelledby="profilePictureEnlargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 bg-dark">
+            <div class="modal-header border-secondary border-opacity-25 py-2">
+                <h5 class="modal-title text-white small mb-0" id="profilePictureEnlargeModalLabel">Profile picture</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-3">
+                <img id="profilePictureEnlargeImg" src="" alt="" class="img-fluid rounded" style="max-height: min(85vh, 720px); object-fit: contain;" />
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    // Image preview functionality
+    const profilePictureInput = document.getElementById('profilePictureInput');
+    const imagePreview = document.getElementById('imagePreview');
+    const previewContainer = document.getElementById('previewContainer');
+    const profilePreview = document.getElementById('profilePreview');
+    const removePictureBtn = document.getElementById('removePictureBtn');
+    const removePictureFormBtn = document.getElementById('removePictureFormBtn');
+    const updatePictureBtn = document.getElementById('updatePictureBtn');
+
+    if (profilePictureInput) {
+        profilePictureInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    previewContainer.style.display = 'block';
+                    updatePictureBtn.disabled = false;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                previewContainer.style.display = 'none';
+                imagePreview.src = '#';
+            }
+        });
+    }
+
+    // Click (or keyboard) on avatar â†’ enlarged modal
+    const enlargeModalEl = document.getElementById('profilePictureEnlargeModal');
+    const enlargeModalImg = document.getElementById('profilePictureEnlargeImg');
+    if (profilePreview && enlargeModalEl && enlargeModalImg && typeof bootstrap !== 'undefined') {
+        const enlargeModal = new bootstrap.Modal(enlargeModalEl);
+        function openProfileEnlarge() {
+            enlargeModalImg.src = profilePreview.currentSrc || profilePreview.src;
+            enlargeModalImg.alt = profilePreview.alt || 'Profile picture';
+            enlargeModal.show();
+        }
+        profilePreview.addEventListener('click', openProfileEnlarge);
+        profilePreview.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                openProfileEnlarge();
+            }
+        });
+    }
+
+    // Confirm before removing picture
+    if (removePictureFormBtn) {
+        removePictureFormBtn.addEventListener('click', function(e) {
+            if (!confirm('Are you sure you want to remove your profile picture?')) {
+                e.preventDefault();
+            }
+        });
+    }
+</script>
+}

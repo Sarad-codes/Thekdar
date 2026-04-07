@@ -1,0 +1,115 @@
+﻿@model Thekdar.Models.UserModel
+@using Thekdar.Models
+
+@{
+    ViewData["Title"] = "Contractor Added";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0"><i class="fas fa-check-circle me-2"></i>Contractor Added Successfully!</h4>
+                </div>
+                <div class="card-body text-center py-5">
+                    <!-- Animated success icon -->
+                    <div class="mb-4">
+                        <i class="fas fa-user-check fa-5x text-success"></i>
+                    </div>
+
+                    <h3 class="fw-bold mb-2">@Model.Name</h3>
+
+                    <!-- Role badge -->
+                    @if (Model.Role == UserRole.Admin)
+                    {
+                        <span class="badge bg-danger px-3 py-2 mb-3">
+                            <i class="fas fa-crown me-1"></i>Administrator
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-primary px-3 py-2 mb-3">
+                            <i class="fas fa-hard-hat me-1"></i>Contractor
+                        </span>
+                    }
+
+                    <p class="text-muted mb-4">has been successfully added to the system.</p>
+
+                    <!-- User details card -->
+                    <div class="alert alert-light border rounded-3 text-start mb-4">
+                        <div class="d-flex align-items-center mb-3 pb-2 border-bottom">
+                            <i class="fas fa-info-circle text-primary me-2"></i>
+                            <strong class="text-dark">Contractor Information</strong>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-5 text-muted">
+                                <i class="fas fa-envelope me-2"></i>Email:
+                            </div>
+                            <div class="col-7 text-dark">@Model.Email</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-5 text-muted">
+                                <i class="fas fa-phone me-2"></i>Phone:
+                            </div>
+                            <div class="col-7 text-dark">@Model.Phone</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-5 text-muted">
+                                <i class="fas fa-calendar-alt me-2"></i>Age:
+                            </div>
+                            <div class="col-7 text-dark">@Model.Age</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-5 text-muted">
+                                <i class="fas fa-user-tag me-2"></i>Role:
+                            </div>
+                            <div class="col-7">
+                                @if (Model.Role == UserRole.Admin)
+                                {
+                                    <span class="badge bg-danger">Administrator</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-primary">Contractor</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Profile picture preview if exists -->
+                    @if (Model.ProfilePicture != null)
+                    {
+                        <div class="mb-4">
+                            <img src="@Url.Action("GetProfilePicture", "User", new { id = Model.Id })" 
+                                 alt="@Model.Name" 
+                                 class="rounded-circle" 
+                                 style="width: 80px; height: 80px; object-fit: cover; border: 3px solid #3b82f6;" />
+                            <p class="text-muted small mt-2">Profile picture uploaded</p>
+                        </div>
+                    }
+
+                    <div class="d-flex gap-2">
+                        <a asp-action="List" class="btn btn-primary flex-fill">
+                            <i class="fas fa-list me-2"></i>View All Contractors
+                        </a>
+                        <a asp-action="Register" class="btn btn-outline-primary flex-fill">
+                            <i class="fas fa-user-plus me-2"></i>Add Another
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .alert-light {
+        background-color: #f8f9fa;
+        border-color: #e9ecef;
+    }
+    
+    .border-bottom {
+        border-bottom: 1px solid #dee2e6 !important;
+    }
+</style>

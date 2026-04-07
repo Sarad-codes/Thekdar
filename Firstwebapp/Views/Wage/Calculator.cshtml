@@ -1,0 +1,284 @@
+@model Thekdar.ViewModels.PayrollCalculationViewModel
+@{
+    ViewData["Title"] = "Wage Calculator";
+    var hasSelectedWorker = Model.EmployeeId.HasValue;
+}
+
+<div class="container-fluid px-0">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <div>
+            <h2 class="mb-1">
+                <i class="fas fa-calculator text-success me-2"></i>Wage Calculator
+            </h2>
+            <p class="text-muted mb-0">Calculate, review, and save payroll for workers.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-controller="Payroll" asp-action="History" class="btn btn-outline-secondary">
+                <i class="fas fa-history me-2"></i>Payroll History
+            </a>
+            <a asp-action="Calculator" class="btn btn-outline-primary">
+                <i class="fas fa-rotate-left me-2"></i>Reset
+            </a>
+        </div>
+    </div>
+
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-users me-2"></i>Select Worker
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" class="mb-3">
+                        <input type="hidden" name="employeeId" value="@Model.EmployeeId" />
+                        <input type="hidden" name="periodStart" value="@Model.PeriodStart.ToString("yyyy-MM-dd")" />
+                        <input type="hidden" name="periodEnd" value="@Model.PeriodEnd.ToString("yyyy-MM-dd")" />
+
+                        <label class="form-label fw-semibold">Find by name, trade, or phone</label>
+                        <div class="input-group">
+                            <input asp-for="SearchTerm" name="searchTerm" class="form-control" placeholder="Search workers..." />
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+
+                    @if (Model.SearchResults?.Any() == true)
+                    {
+                        <div class="list-group list-group-flush">
+                            @foreach (var worker in Model.SearchResults)
+                            {
+                                var isSelected = worker.Id == Model.EmployeeId;
+                                <a asp-action="Calculator"
+                                   asp-route-employeeId="@worker.Id"
+                                   asp-route-searchTerm="@Model.SearchTerm"
+                                   asp-route-periodStart="@Model.PeriodStart.ToString("yyyy-MM-dd")"
+                                   asp-route-periodEnd="@Model.PeriodEnd.ToString("yyyy-MM-dd")"
+                                   class="list-group-item list-group-item-action @(isSelected ? "active" : "")">
+                                    <div class="d-flex justify-content-between align-items-start gap-2">
+                                        <div>
+                                            <div class="fw-semibold">@worker.Name</div>
+                                            <div class="small @(isSelected ? "text-white-50" : "text-muted")">@worker.Trade</div>
+                                            <div class="small @(isSelected ? "text-white-50" : "text-muted")">@worker.Phone</div>
+                                        </div>
+                                        <div class="text-end">
+                                            <div class="small fw-semibold">NPR @worker.DailyRate.ToString("N0")</div>
+                                            <span class="badge @(worker.IsAvailable ? "bg-success" : "bg-secondary")">
+                                                @(worker.IsAvailable ? "Available" : "Unavailable")
+                                            </span>
+                                        </div>
+                                    </div>
+                                </a>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center text-muted py-5">
+                            <i class="fas fa-user-slash fa-2x mb-3"></i>
+                            <p class="mb-0">No workers matched your search.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            @if (!hasSelectedWorker)
+            {
+                <div class="card shadow-sm border-0">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-hand-pointer fa-3x text-muted mb-3"></i>
+                        <h4>Select a worker to start</h4>
+                        <p class="text-muted mb-0">Choose a worker from the list on the left, then enter the pay details.</p>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-5">
+                                <div class="small text-muted">Worker</div>
+                                <div class="fs-5 fw-semibold">@Model.EmployeeName</div>
+                                <div class="text-muted">@Model.EmployeeTrade</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="small text-muted">Daily Rate</div>
+                                <div class="fs-5 fw-semibold text-success">NPR @Model.DailyRate.ToString("N0")</div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="small text-muted">Work Summary</div>
+                                <div class="fw-semibold">@Model.SuggestedDaysWorked day(s) across @Model.MatchingAssignments assignment(s)</div>
+                                <div class="small text-muted">You can adjust the days worked manually below.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <form asp-action="Calculator" method="post" class="card shadow-sm border-0 mb-4">
+                    @Html.AntiForgeryToken()
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-file-invoice-dollar me-2"></i>Calculation Details
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <input asp-for="EmployeeId" type="hidden" />
+                        <input asp-for="SearchTerm" type="hidden" />
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="PeriodStart" class="form-label"></label>
+                                <input asp-for="PeriodStart" class="form-control" type="date" />
+                                <span asp-validation-for="PeriodStart" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="PeriodEnd" class="form-label"></label>
+                                <input asp-for="PeriodEnd" class="form-control" type="date" />
+                                <span asp-validation-for="PeriodEnd" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="DaysWorked" class="form-label"></label>
+                                <input asp-for="DaysWorked" class="form-control" />
+                                <span asp-validation-for="DaysWorked" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="OvertimeHours" class="form-label"></label>
+                                <input asp-for="OvertimeHours" class="form-control" />
+                                <span asp-validation-for="OvertimeHours" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="OvertimeMultiplier" class="form-label"></label>
+                                <input asp-for="OvertimeMultiplier" class="form-control" />
+                                <span asp-validation-for="OvertimeMultiplier" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Bonus" class="form-label"></label>
+                                <input asp-for="Bonus" class="form-control" />
+                                <span asp-validation-for="Bonus" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="BonusReason" class="form-label"></label>
+                                <input asp-for="BonusReason" class="form-control" placeholder="Optional reason for bonus" />
+                                <span asp-validation-for="BonusReason" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Deduction" class="form-label"></label>
+                                <input asp-for="Deduction" class="form-control" />
+                                <span asp-validation-for="Deduction" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="DeductionReason" class="form-label"></label>
+                                <input asp-for="DeductionReason" class="form-control" placeholder="Optional reason for deduction" />
+                                <span asp-validation-for="DeductionReason" class="text-danger small"></span>
+                            </div>
+                            <div class="col-12">
+                                <label asp-for="Notes" class="form-label"></label>
+                                <textarea asp-for="Notes" class="form-control" rows="3" placeholder="Optional payroll notes"></textarea>
+                                <span asp-validation-for="Notes" class="text-danger small"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div class="small text-muted">
+                            Preview recalculates from the worker's current daily rate.
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-equals me-2"></i>Preview Payroll
+                        </button>
+                    </div>
+                </form>
+
+                @if (Model.HasCalculated)
+                {
+                    <div class="card shadow-sm border-0">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-receipt me-2"></i>Payroll Preview
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-6 col-xl-3">
+                                    <div class="border rounded p-3 h-100">
+                                        <div class="small text-muted">Base Wage</div>
+                                        <div class="fs-5 fw-semibold">NPR @Model.BaseWage.ToString("N2")</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-xl-3">
+                                    <div class="border rounded p-3 h-100">
+                                        <div class="small text-muted">Overtime Wage</div>
+                                        <div class="fs-5 fw-semibold">NPR @Model.OvertimeWage.ToString("N2")</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-xl-3">
+                                    <div class="border rounded p-3 h-100">
+                                        <div class="small text-muted">Total Wage</div>
+                                        <div class="fs-5 fw-semibold text-primary">NPR @Model.TotalWage.ToString("N2")</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-xl-3">
+                                    <div class="border rounded p-3 h-100 bg-light">
+                                        <div class="small text-muted">Net Payable</div>
+                                        <div class="fs-4 fw-bold text-success">NPR @Model.NetPayable.ToString("N2")</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr />
+
+                            <div class="row g-3 small">
+                                <div class="col-md-3">
+                                    <div class="text-muted">Days Worked</div>
+                                    <div class="fw-semibold">@Model.DaysWorked</div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="text-muted">Overtime</div>
+                                    <div class="fw-semibold">@Model.OvertimeHours hour(s)</div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="text-muted">Bonus</div>
+                                    <div class="fw-semibold">NPR @Model.Bonus.ToString("N2")</div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="text-muted">Deduction</div>
+                                    <div class="fw-semibold">NPR @Model.Deduction.ToString("N2")</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white d-flex justify-content-end">
+                            <form asp-action="Save" method="post">
+                                @Html.AntiForgeryToken()
+                                <input asp-for="EmployeeId" type="hidden" />
+                                <input asp-for="SearchTerm" type="hidden" />
+                                <input asp-for="PeriodStart" type="hidden" />
+                                <input asp-for="PeriodEnd" type="hidden" />
+                                <input asp-for="DaysWorked" type="hidden" />
+                                <input asp-for="OvertimeHours" type="hidden" />
+                                <input asp-for="OvertimeMultiplier" type="hidden" />
+                                <input asp-for="Bonus" type="hidden" />
+                                <input asp-for="BonusReason" type="hidden" />
+                                <input asp-for="Deduction" type="hidden" />
+                                <input asp-for="DeductionReason" type="hidden" />
+                                <input asp-for="Notes" type="hidden" />
+                                <button type="submit" class="btn btn-success btn-lg">
+                                    <i class="fas fa-save me-2"></i>Save Payroll
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

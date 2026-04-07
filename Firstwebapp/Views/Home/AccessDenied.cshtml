@@ -1,0 +1,135 @@
+@{
+    ViewData["Title"] = "Access Denied";
+    Layout = "_Layout";
+}
+
+<div class="container mt-5 pt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <!-- Animated gradient header -->
+                <div class="card-header bg-gradient-danger text-white text-center py-5 position-relative" style="background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);">
+                    <div class="position-absolute top-0 start-0 w-100 h-100 opacity-10" style="background: repeating-linear-gradient(45deg, #fff, #fff 10px, transparent 10px, transparent 20px);"></div>
+                    <div class="position-relative">
+                        <div class="mb-3">
+                            <i class="fas fa-shield-alt fa-4x"></i>
+                        </div>
+                        <h1 class="display-4 fw-bold mb-0">Access Denied</h1>
+                        <p class="lead mb-0 mt-2 opacity-90">Authentication Required</p>
+                    </div>
+                </div>
+                
+                <div class="card-body p-5">
+                    <!-- Main message -->
+                    <div class="text-center mb-4">
+                        <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width: 80px; height: 80px;">
+                            <i class="fas fa-lock fa-3x text-danger"></i>
+                        </div>
+                        <h3 class="fw-semibold text-dark">You don't have permission</h3>
+                        <p class="text-muted mb-0">
+                            You need appropriate permissions to access this page.
+                        </p>
+                    </div>
+                    
+                    <!-- Helpful suggestions -->
+                    <div class="bg-light rounded-3 p-4 mb-4">
+                        <h5 class="fw-semibold mb-3">
+                            <i class="fas fa-info-circle text-primary me-2"></i>
+                            What can you do?
+                        </h5>
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2">
+                                <i class="fas fa-key text-success me-2"></i>
+                                <span>Verify your account has the correct role (For now only admin can look at the report..)</span>
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-sign-in-alt text-info me-2"></i>
+                                <span>Try logging in with a different account</span>
+                            </li>
+                            <li>
+                                <i class="fas fa-envelope text-warning me-2"></i>
+                                <span>Contact your administrator for access</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Action buttons -->
+                    <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary px-4 py-2 rounded-pill">
+                            <i class="fas fa-home me-2"></i> Go Home
+                        </a>
+                        <a asp-controller="Auth" asp-action="Login" class="btn btn-primary px-4 py-2 rounded-pill shadow-sm">
+                            <i class="fas fa-sign-in-alt me-2"></i> Sign In
+                        </a>
+                        <button onclick="history.back()" class="btn btn-outline-primary px-4 py-2 rounded-pill">
+                            <i class="fas fa-arrow-left me-2"></i> Go Back
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Footer with support info -->
+                <div class="card-footer bg-white border-0 text-center pb-4">
+                    <p class="text-muted small mb-0">
+                        <i class="fas fa-question-circle me-1"></i> Need help? 
+                        <a href="#" class="text-decoration-none">Contact Support</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-gradient-danger {
+        background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+    }
+    
+    .opacity-10 {
+        opacity: 0.1;
+    }
+    
+    .rounded-4 {
+        border-radius: 1rem !important;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+        border: none;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+        background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%);
+    }
+    
+    .btn-outline-primary {
+        transition: all 0.2s;
+    }
+    
+    .btn-outline-primary:hover {
+        transform: translateY(-2px);
+    }
+    
+    .btn-outline-secondary {
+        transition: all 0.2s;
+    }
+    
+    .btn-outline-secondary:hover {
+        transform: translateY(-2px);
+    }
+    
+    .bg-light {
+        background-color: #f8fafc !important;
+    }
+    
+    .card {
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    .card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.2) !important;
+    }
+</style>
