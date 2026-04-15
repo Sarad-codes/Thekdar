@@ -11,13 +11,30 @@
         <h2>
             <i class="fas fa-history text-primary me-2"></i>Payroll History
         </h2>
-        <div class="d-flex gap-2">
-            <a asp-action="Statistics" class="btn btn-info">
-                <i class="fas fa-chart-bar me-2"></i>Statistics
-            </a>
-            <a asp-controller="Wage" asp-action="Calculator" class="btn btn-success">
-                <i class="fas fa-calculator me-2"></i>New Calculation
-            </a>
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                <i class="fas fa-cog me-2"></i>Actions
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                <li>
+                    <a asp-action="Statistics" class="dropdown-item">
+                        <i class="fas fa-chart-bar text-info me-2"></i>View Statistics
+                    </a>
+                </li>
+                <li>
+                    <a asp-controller="Invoice" asp-action="Index" class="dropdown-item">
+                        <i class="fas fa-file-invoice-dollar text-primary me-2"></i>Open Invoices
+                    </a>
+                </li>
+                <li>
+                    <a asp-controller="Wage" asp-action="Calculator" class="dropdown-item">
+                        <i class="fas fa-calculator text-success me-2"></i>New Calculation
+                    </a>
+                </li>
+            </ul>
         </div>
     </div>
 
@@ -134,22 +151,42 @@
                                 }
                             </td>
                             <td>
-                                <div class="btn-group btn-group-sm">
-                                    <a asp-action="Payslip" asp-route-id="@payroll.Id" class="btn btn-outline-primary" title="View Payslip">
-                                        <i class="fas fa-file-invoice"></i>
-                                    </a>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                            type="button"
+                                            data-bs-toggle="dropdown"
+                                            aria-expanded="false">
+                                        <i class="fas fa-cog me-1"></i>Actions
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                        <li>
+                                            <a asp-action="Payslip" asp-route-id="@payroll.Id" class="dropdown-item">
+                                                <i class="fas fa-eye text-primary me-2"></i>View Payslip
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a asp-action="Payslip" asp-route-id="@payroll.Id" asp-route-print="true" target="_blank" class="dropdown-item">
+                                                <i class="fas fa-print text-secondary me-2"></i>Print Payslip
+                                            </a>
+                                        </li>
                                     @if (payroll.Status != PaymentStatus.Paid)
                                     {
-                                        <button type="button" class="btn btn-outline-success" title="Mark as Paid" data-bs-toggle="modal" data-bs-target="#paymentModal-@payroll.Id">
-                                            <i class="fas fa-money-bill-wave"></i>
-                                        </button>
+                                            <li>
+                                                <button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#paymentModal-@payroll.Id">
+                                                    <i class="fas fa-money-bill-wave text-success me-2"></i>Mark as Paid
+                                                </button>
+                                            </li>
                                     }
                                     @if (ViewBag.IsAdmin)
                                     {
-                                        <button type="button" class="btn btn-outline-danger" title="Delete" onclick="confirmDelete('@payroll.Id')">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li>
+                                                <button type="button" class="dropdown-item text-danger" onclick="confirmDelete('@payroll.Id')">
+                                                    <i class="fas fa-trash me-2"></i>Delete Payroll
+                                                </button>
+                                            </li>
                                     }
+                                    </ul>
                                 </div>
 
                                 <!-- Payment Modal -->

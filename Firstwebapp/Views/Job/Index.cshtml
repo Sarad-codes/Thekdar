@@ -7,18 +7,120 @@
     int? currentUserId = null;
     if (int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var uid))
         currentUserId = uid;
+    
+    // Get current sort and search parameters
+    string currentSortBy = ViewBag.SortBy ?? "ScheduledDate";
+    string currentSortOrder = ViewBag.SortOrder ?? "desc";
+    string searchTerm = ViewBag.SearchTerm ?? "";
 }
+
+<style>
+    .dropdown-menu {
+        max-height: 300px;
+        overflow-y: auto;
+        z-index: 1050;
+    }
+    
+    .card-body {
+        overflow: visible;
+    }
+    
+    .table-responsive {
+        overflow: visible;
+    }
+</style>
 
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2><i class="fas fa-briefcase me-2"></i>Jobs</h2>
-        @if (User.IsInRole("Admin") || User.IsInRole("Contractor"))
-        {
-            <a asp-action="Create" class="btn btn-primary">
-                <i class="fas fa-plus me-2"></i>New Job
-            </a>
-        }
+        <div class="d-flex gap-2">
+            <!-- Sort Dropdown for Mobile -->
+            <div class="dropdown d-md-none">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    <i class="fas fa-sort me-1"></i>Sort
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item @(currentSortBy == "Title" ? "active" : "")" href="@GetSortLink("Title")">Title @GetSortIndicator("Title")</a></li>
+                    <li><a class="dropdown-item @(currentSortBy == "ClientName" ? "active" : "")" href="@GetSortLink("ClientName")">Client @GetSortIndicator("ClientName")</a></li>
+                    <li><a class="dropdown-item @(currentSortBy == "Address" ? "active" : "")" href="@GetSortLink("Address")">Address @GetSortIndicator("Address")</a></li>
+                    <li><a class="dropdown-item @(currentSortBy == "ScheduledDate" ? "active" : "")" href="@GetSortLink("ScheduledDate")">Date @GetSortIndicator("ScheduledDate")</a></li>
+                    <li><a class="dropdown-item @(currentSortBy == "Status" ? "active" : "")" href="@GetSortLink("Status")">Status @GetSortIndicator("Status")</a></li>
+                    <li><a class="dropdown-item @(currentSortBy == "AssignedCount" ? "active" : "")" href="@GetSortLink("AssignedCount")">Assigned @GetSortIndicator("AssignedCount")</a></li>
+                </ul>
+            </div>
+            
+            @if (User.IsInRole("Admin") || User.IsInRole("Contractor"))
+            {
+                <a asp-action="Create" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>New Job
+                </a>
+            }
+        </div>
     </div>
+
+    <!-- Search Bar -->
+    <div class="card shadow-sm border-0 mb-3">
+        <div class="card-body p-2 p-md-3">
+            <form method="get" asp-action="Index" class="row g-2 align-items-end" id="searchForm">
+                <div class="col-12 col-md-5 col-lg-6">
+                    <label class="form-label small fw-semibold"><i class="fas fa-search me-1"></i>Search Jobs</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-filter"></i></span>
+                        <input type="text" name="searchTerm" class="form-control" 
+                               placeholder="Search by title, client name, or address..." 
+                               value="@searchTerm" />
+                    </div>
+                </div>
+                <div class="col-6 col-md-3 col-lg-2">
+                    <label class="form-label small fw-semibold">Sort By</label>
+                    <select name="sortBy" class="form-select">
+                        <option value="ScheduledDate" selected="@(currentSortBy == "ScheduledDate")">Scheduled Date</option>
+                        <option value="Title" selected="@(currentSortBy == "Title")">Title</option>
+                        <option value="ClientName" selected="@(currentSortBy == "ClientName")">Client</option>
+                        <option value="Address" selected="@(currentSortBy == "Address")">Address</option>
+                        <option value="Status" selected="@(currentSortBy == "Status")">Status</option>
+                        <option value="AssignedCount" selected="@(currentSortBy == "AssignedCount")">Assigned Count</option>
+                    </select>
+                </div>
+                <div class="col-3 col-md-2 col-lg-2">
+                    <label class="form-label small fw-semibold">Order</label>
+                    <select name="sortOrder" class="form-select">
+                        <option value="desc" selected="@(currentSortOrder == "desc")">Descending</option>
+                        <option value="asc" selected="@(currentSortOrder == "asc")">Ascending</option>
+                    </select>
+                </div>
+                <div class="col-3 col-md-2 col-lg-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search me-1"></i>Apply
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Active Filters Indicator -->
+    @if (!string.IsNullOrEmpty(searchTerm) || currentSortBy != "ScheduledDate" || currentSortOrder != "desc")
+    {
+        <div class="alert alert-info alert-dismissible fade show mb-3 py-2 d-flex flex-wrap align-items-center gap-2">
+            <div class="d-flex flex-wrap gap-1">
+                @if (!string.IsNullOrEmpty(searchTerm))
+                {
+                    <span class="badge bg-primary"><i class="fas fa-search me-1"></i>Search: "@searchTerm"</span>
+                }
+                @if (currentSortBy != "ScheduledDate" || currentSortOrder != "desc")
+                {
+                    <span class="badge bg-secondary">
+                        <i class="fas fa-sort me-1"></i>Sort: @GetSortDisplayName(currentSortBy) 
+                        (@(currentSortOrder == "asc" ? "Ascending" : "Descending"))
+                    </span>
+                }
+            </div>
+            <a href="@Url.Action("Index")" class="alert-link ms-auto">
+                <i class="fas fa-times-circle"></i> Clear All Filters
+            </a>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
 
     @if (TempData["Error"] != null)
     {
@@ -28,12 +130,26 @@
         </div>
     }
 
+    <!-- Results Count -->
+    <div class="mb-2">
+        <small class="text-muted">
+            <i class="fas fa-list me-1"></i>@Model.Count() job@(Model.Count() != 1 ? "s" : "") found
+        </small>
+    </div>
+
     @if (!Model.Any())
     {
         <div class="text-center py-5 text-muted">
             <i class="fas fa-briefcase fa-4x mb-3"></i>
-            <p class="fs-5">No jobs yet.</p>
-            @if (User.IsInRole("Admin") || User.IsInRole("Contractor"))
+            <p class="fs-5">No jobs found.</p>
+            @if (!string.IsNullOrEmpty(searchTerm))
+            {
+                <p class="mb-3">No results for "<strong>@searchTerm</strong>"</p>
+                <a href="@Url.Action("Index")" class="btn btn-outline-primary">
+                    <i class="fas fa-times me-1"></i>Clear Search
+                </a>
+            }
+            else if (User.IsInRole("Admin") || User.IsInRole("Contractor"))
             {
                 <a asp-action="Create" class="btn btn-primary mt-2">
                     <i class="fas fa-plus me-2"></i>Create First Job
@@ -51,141 +167,201 @@
                         <table class="table table-hover align-middle mb-0">
                             <thead class="table-dark">
                                 <tr>
-                                    <th style="width: 25%">Title</th>
-                                    <th style="width: 15%">Client</th>
-                                    <th style="width: 20%">Address</th>
-                                    <th style="width: 12%">Scheduled</th>
-                                    <th style="width: 10%">Status</th>
-                                    <th style="width: 8%">Assigned</th>
+                                    <th style="width: 25%">
+                                        <a href="@GetSortLink("Title")" class="text-white text-decoration-none d-flex align-items-center gap-1">
+                                            Title 
+                                            <i class="fas @GetSortIcon("Title")"></i>
+                                            @if (currentSortBy == "Title") {
+                                                <span class="badge bg-light text-dark ms-1">@(currentSortOrder == "asc" ? "↑" : "↓")</span>
+                                            }
+                                        </a>
+                                    </th>
+                                    <th style="width: 15%">
+                                        <a href="@GetSortLink("ClientName")" class="text-white text-decoration-none d-flex align-items-center gap-1">
+                                            Client 
+                                            <i class="fas @GetSortIcon("ClientName")"></i>
+                                            @if (currentSortBy == "ClientName") {
+                                                <span class="badge bg-light text-dark ms-1">@(currentSortOrder == "asc" ? "↑" : "↓")</span>
+                                            }
+                                        </a>
+                                    </th>
+                                    <th style="width: 20%">
+                                        <a href="@GetSortLink("Address")" class="text-white text-decoration-none d-flex align-items-center gap-1">
+                                            Address 
+                                            <i class="fas @GetSortIcon("Address")"></i>
+                                            @if (currentSortBy == "Address") {
+                                                <span class="badge bg-light text-dark ms-1">@(currentSortOrder == "asc" ? "↑" : "↓")</span>
+                                            }
+                                        </a>
+                                    </th>
+                                    <th style="width: 12%">
+                                        <a href="@GetSortLink("ScheduledDate")" class="text-white text-decoration-none d-flex align-items-center gap-1">
+                                            Scheduled 
+                                            <i class="fas @GetSortIcon("ScheduledDate")"></i>
+                                            @if (currentSortBy == "ScheduledDate") {
+                                                <span class="badge bg-light text-dark ms-1">@(currentSortOrder == "asc" ? "↑" : "↓")</span>
+                                            }
+                                        </a>
+                                    </th>
+                                    <th style="width: 10%">
+                                        <a href="@GetSortLink("Status")" class="text-white text-decoration-none d-flex align-items-center gap-1">
+                                            Status 
+                                            <i class="fas @GetSortIcon("Status")"></i>
+                                            @if (currentSortBy == "Status") {
+                                                <span class="badge bg-light text-dark ms-1">@(currentSortOrder == "asc" ? "↑" : "↓")</span>
+                                            }
+                                        </a>
+                                    </th>
+                                    <th style="width: 8%">
+                                        <a href="@GetSortLink("AssignedCount")" class="text-white text-decoration-none d-flex align-items-center gap-1">
+                                            Assigned 
+                                            <i class="fas @GetSortIcon("AssignedCount")"></i>
+                                            @if (currentSortBy == "AssignedCount") {
+                                                <span class="badge bg-light text-dark ms-1">@(currentSortOrder == "asc" ? "↑" : "↓")</span>
+                                            }
+                                        </a>
+                                    </th>
                                     <th style="width: 10%">Actions</th>
-                                 </thead>
-                                <tbody>
-                                    @foreach (var job in Model)
-                                    {
-                                        var canManageJob = User.IsInRole("Admin")
-                                            || (User.IsInRole("Contractor") && currentUserId.HasValue && job.CreatedByUserId == currentUserId);
-                                        <tr data-job-id="@job.Id">
-                                            <td class="fw-semibold">
-                                                <a asp-action="Details" asp-route-id="@job.Id" class="text-decoration-none text-dark">
-                                                    @job.Title
-                                                </a>
-                                              </td>
-                                            <td class="text-truncate" style="max-width: 150px;" title="@job.ClientName">@(job.ClientName ?? "â€”")</td>
-                                            <td class="text-truncate" style="max-width: 180px;" title="@job.Address">@(job.Address ?? "â€”")</td>
-                                            <td>
-                                                @(job.ScheduledDate.HasValue
-                                                    ? job.ScheduledDate.Value.ToString("MMM dd, yyyy")
-                                                    : "â€”")
-                                            </td>
-                                            <td>
-                                                @if (job.Status == JobStatus.Active)
-                                                {
-                                                    <span class="badge bg-primary px-3 py-1">Active</span>
-                                                }
-                                                else if (job.Status == JobStatus.PendingConfirmation)
-                                                {
-                                                    <span class="badge bg-warning text-dark px-3 py-1">Pending</span>
-                                                }
-                                                else
-                                                {
-                                                    <span class="badge bg-success px-3 py-1">Completed</span>
-                                                }
-                                            </td>
-                                            <td>
-                                                <span class="badge bg-secondary" id="assignedCount-@job.Id">
-                                                    <i class="fas fa-users me-1"></i>Loading...
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <div class="dropdown">
-                                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" 
-                                                            type="button" 
-                                                            data-bs-toggle="dropdown" 
-                                                            aria-expanded="false">
-                                                        <i class="fas fa-cog me-1"></i>Actions
-                                                    </button>
-                                                    <ul class="dropdown-menu shadow-sm">
-                                                        <!-- View Details -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var job in Model)
+                                {
+                                    var canManageJob = User.IsInRole("Admin")
+                                        || (User.IsInRole("Contractor") && currentUserId.HasValue && job.CreatedByUserId == currentUserId);
+                                    <tr data-job-id="@job.Id">
+                                        <td class="fw-semibold">
+                                            <a asp-action="Details" asp-route-id="@job.Id" class="text-decoration-none text-dark">
+                                                @Html.Raw(HighlightSearchTerm(job.Title, searchTerm))
+                                            </a>
+                                        </td>
+                                        <td class="text-truncate" style="max-width: 150px;" title="@job.ClientName">
+                                            @Html.Raw(HighlightSearchTerm(job.ClientName ?? "—", searchTerm))
+                                        </td>
+                                        <td class="text-truncate" style="max-width: 180px;" title="@job.Address">
+                                            @Html.Raw(HighlightSearchTerm(job.Address ?? "—", searchTerm))
+                                        </td>
+                                        <td>
+                                            @(job.ScheduledDate.HasValue
+                                                ? job.ScheduledDate.Value.ToString("MMM dd, yyyy")
+                                                : "—")
+                                        </td>
+                                        <td>
+                                            @if (job.Status == JobStatus.Active)
+                                            {
+                                                <span class="badge bg-primary px-3 py-1">Active</span>
+                                            }
+                                            else if (job.Status == JobStatus.PendingConfirmation)
+                                            {
+                                                <span class="badge bg-warning text-dark px-3 py-1">Pending</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-success px-3 py-1">Completed</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary" id="assignedCount-@job.Id">
+                                                <i class="fas fa-users me-1"></i>Loading...
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" 
+                                                        type="button" 
+                                                        data-bs-toggle="dropdown" 
+                                                        aria-expanded="false">
+                                                    <i class="fas fa-cog me-1"></i>Actions
+                                                </button>
+                                                <ul class="dropdown-menu shadow-sm">
+                                                    <li>
+                                                        <a asp-action="Details" asp-route-id="@job.Id" class="dropdown-item">
+                                                            <i class="fas fa-eye text-primary me-2"></i>View Details
+                                                        </a>
+                                                    </li>
+                                                    @if (canManageJob)
+                                                    {
                                                         <li>
-                                                            <a asp-action="Details" asp-route-id="@job.Id" class="dropdown-item">
-                                                                <i class="fas fa-eye text-primary me-2"></i>View Details
+                                                            <button type="button" 
+                                                                    class="dropdown-item" 
+                                                                    onclick="loadAssignModal('@job.Id', '@job.Title.Replace("'", "\\'")')">
+                                                                <i class="fas fa-user-plus text-success me-2"></i>Assign Workers
+                                                            </button>
+                                                        </li>
+                                                    }
+                                                    @if (canManageJob && job.Status != JobStatus.Completed)
+                                                    {
+                                                        <li>
+                                                            <a asp-action="Edit" asp-route-id="@job.Id" class="dropdown-item">
+                                                                <i class="fas fa-edit text-warning me-2"></i>Edit Job
                                                             </a>
                                                         </li>
-
-                                                        <!-- Assign Workers -->
-                                                        @if (canManageJob)
-                                                        {
-                                                            <li>
-                                                                <button type="button" 
-                                                                        class="dropdown-item" 
-                                                                        onclick="loadAssignModal('@job.Id', '@job.Title.Replace("'", "\\'")')">
-                                                                    <i class="fas fa-user-plus text-success me-2"></i>Assign Workers
+                                                    }
+                                                    @if (canManageJob && job.Status == JobStatus.Active)
+                                                    {
+                                                        <li>
+                                                            <form asp-action="MarkComplete" asp-route-id="@job.Id" method="post">
+                                                                @Html.AntiForgeryToken()
+                                                                <button type="submit" class="dropdown-item" 
+                                                                        onclick="return confirm('Mark this job as complete?')">
+                                                                    <i class="fas fa-check text-info me-2"></i>Mark Complete
                                                                 </button>
-                                                            </li>
-                                                        }
-
-                                                        <!-- Edit Job -->
-                                                        @if (canManageJob && job.Status != JobStatus.Completed)
-                                                        {
-                                                            <li>
-                                                                <a asp-action="Edit" asp-route-id="@job.Id" class="dropdown-item">
-                                                                    <i class="fas fa-edit text-warning me-2"></i>Edit Job
-                                                                </a>
-                                                            </li>
-                                                        }
-
-                                                        <!-- Mark Complete -->
-                                                        @if (canManageJob && job.Status == JobStatus.Active)
-                                                        {
-                                                            <li>
-                                                                <form asp-action="MarkComplete" asp-route-id="@job.Id" method="post">
-                                                                    @Html.AntiForgeryToken()
-                                                                    <button type="submit" class="dropdown-item" 
-                                                                            onclick="return confirm('Mark this job as complete?')">
-                                                                        <i class="fas fa-check text-info me-2"></i>Mark Complete
-                                                                    </button>
-                                                                </form>
-                                                            </li>
-                                                        }
-
-                                                        <!-- Confirm Complete (Admin only) -->
-                                                        @if (User.IsInRole("Admin") && job.Status == JobStatus.PendingConfirmation)
-                                                        {
-                                                            <li>
-                                                                <form asp-action="ConfirmComplete" asp-route-id="@job.Id" method="post">
-                                                                    @Html.AntiForgeryToken()
-                                                                    <button type="submit" class="dropdown-item" 
-                                                                            onclick="return confirm('Confirm this job is complete?')">
-                                                                        <i class="fas fa-check-double text-success me-2"></i>Confirm Complete
-                                                                    </button>
-                                                                </form>
-                                                            </li>
-                                                        }
-
-                                                        <!-- Divider before delete -->
-                                                        @if (User.IsInRole("Admin"))
-                                                        {
-                                                            <li><hr class="dropdown-divider"></li>
-                                                            <li>
-                                                                <a asp-action="Delete" asp-route-id="@job.Id" class="dropdown-item text-danger">
-                                                                    <i class="fas fa-trash me-2"></i>Delete Job
-                                                                </a>
-                                                            </li>
-                                                        }
-                                                    </ul>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                             </table>
-                        </div>
+                                                            </form>
+                                                        </li>
+                                                    }
+                                                    @if (User.IsInRole("Admin") && job.Status == JobStatus.PendingConfirmation)
+                                                    {
+                                                        <li>
+                                                            <form asp-action="ConfirmComplete" asp-route-id="@job.Id" method="post">
+                                                                @Html.AntiForgeryToken()
+                                                                <button type="submit" class="dropdown-item" 
+                                                                        onclick="return confirm('Confirm this job is complete?')">
+                                                                    <i class="fas fa-check-double text-success me-2"></i>Confirm Complete
+                                                                </button>
+                                                            </form>
+                                                        </li>
+                                                    }
+                                                    @if (User.IsInRole("Admin"))
+                                                    {
+                                                        <li><hr class="dropdown-divider"></li>
+                                                        <li>
+                                                            <a asp-action="Delete" asp-route-id="@job.Id" class="dropdown-item text-danger">
+                                                                <i class="fas fa-trash me-2"></i>Delete Job
+                                                            </a>
+                                                        </li>
+                                                    }
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
+        </div>
 
         <!-- Mobile Card View -->
         <div class="d-block d-md-none">
+            <!-- Mobile Sort/Search Info Bar -->
+            <div class="mb-3 p-2 bg-light rounded d-flex justify-content-between align-items-center">
+                <small class="text-muted">
+                    <i class="fas fa-sort-amount-down me-1"></i>
+                    Sorted by: <strong>@GetSortDisplayName(currentSortBy)</strong>
+                    @if (!string.IsNullOrEmpty(searchTerm))
+                    {
+                        <span class="ms-2">| <i class="fas fa-search me-1"></i>"@searchTerm"</span>
+                    }
+                </small>
+                @if (currentSortBy != "ScheduledDate" || currentSortOrder != "desc" || !string.IsNullOrEmpty(searchTerm))
+                {
+                    <a href="@Url.Action("Index")" class="text-danger small">
+                        <i class="fas fa-times"></i> Clear
+                    </a>
+                }
+            </div>
+            
             <div class="row g-3">
                 @foreach (var job in Model)
                 {
@@ -195,7 +371,9 @@
                         <div class="card shadow-sm">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <h5 class="card-title mb-0 fw-semibold">@job.Title</h5>
+                                    <h5 class="card-title mb-0 fw-semibold">
+                                        @Html.Raw(HighlightSearchTerm(job.Title, searchTerm))
+                                    </h5>
                                     @if (job.Status == JobStatus.Active)
                                     {
                                         <span class="badge bg-primary">Active</span>
@@ -211,8 +389,8 @@
                                 </div>
                                 
                                 <div class="small text-muted mb-2">
-                                    <div><i class="fas fa-user-tie me-1"></i> @(job.ClientName ?? "No client")</div>
-                                    <div><i class="fas fa-map-marker-alt me-1"></i> @(job.Address ?? "No address")</div>
+                                    <div><i class="fas fa-user-tie me-1"></i> @Html.Raw(HighlightSearchTerm(job.ClientName ?? "No client", searchTerm))</div>
+                                    <div><i class="fas fa-map-marker-alt me-1"></i> @Html.Raw(HighlightSearchTerm(job.Address ?? "No address", searchTerm))</div>
                                     <div><i class="fas fa-calendar-alt me-1"></i> 
                                         @(job.ScheduledDate.HasValue
                                             ? job.ScheduledDate.Value.ToString("MMM dd, yyyy")
@@ -226,7 +404,6 @@
                                        class="btn btn-sm btn-outline-secondary">
                                         <i class="fas fa-eye"></i> Details
                                     </a>
-
                                     @if (canManageJob)
                                     {
                                         <button type="button" 
@@ -236,7 +413,6 @@
                                             <i class="fas fa-user-plus"></i> Assign
                                         </button>
                                     }
-
                                     @if (canManageJob && job.Status != JobStatus.Completed)
                                     {
                                         <a asp-action="Edit" asp-route-id="@job.Id"
@@ -244,7 +420,6 @@
                                             <i class="fas fa-edit"></i> Edit
                                         </a>
                                     }
-
                                     @if (canManageJob && job.Status == JobStatus.Active)
                                     {
                                         <form asp-action="MarkComplete" asp-route-id="@job.Id"
@@ -256,7 +431,6 @@
                                             </button>
                                         </form>
                                     }
-
                                     @if (User.IsInRole("Admin") && job.Status == JobStatus.PendingConfirmation)
                                     {
                                         <form asp-action="ConfirmComplete" asp-route-id="@job.Id"
@@ -268,7 +442,6 @@
                                             </button>
                                         </form>
                                     }
-
                                     @if (User.IsInRole("Admin"))
                                     {
                                         <a asp-action="Delete" asp-route-id="@job.Id"
@@ -310,6 +483,15 @@
 
 @section Scripts {
     <script>
+        // Preserve scroll position on form submit
+        const searchForm = document.getElementById('searchForm');
+        if (searchForm) {
+            searchForm.addEventListener('submit', function(e) {
+                const scrollPosition = window.scrollY;
+                localStorage.setItem('jobsScrollPosition', scrollPosition);
+            });
+        }
+        
         // Load assigned employee counts for all jobs
         async function loadAssignedCounts() {
             const jobElements = document.querySelectorAll('[data-job-id]');
@@ -362,15 +544,73 @@
                         `<div class="alert alert-danger">Error loading employees. Please try again.</div>
                          <div class="text-center mt-3">
                              <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                             <button class="btn btn-primary" onclick="loadAssignModal('${jobId}', '${jobTitle}')">Retry</button>
+                             <button class="btn btn-primary" onclick="loadAssignModal('${jobId}', '${jobTitle.replace(/'/g, "\\'")}')">Retry</button>
                          </div>`;
                     modal.show();
                 });
         }
         
-        // Load assigned counts when page loads
+        // Load assigned counts and restore scroll position when page loads
         document.addEventListener('DOMContentLoaded', function() {
             loadAssignedCounts();
+            
+            const savedPosition = localStorage.getItem('jobsScrollPosition');
+            if (savedPosition) {
+                window.scrollTo(0, parseInt(savedPosition));
+                localStorage.removeItem('jobsScrollPosition');
+            }
         });
     </script>
+}
+
+@functions {
+    string GetSortLink(string column)
+    {
+        var sortOrder = ViewBag.SortBy == column && ViewBag.SortOrder == "asc" ? "desc" : "asc";
+        var searchTerm = ViewBag.SearchTerm ?? "";
+        return Url.Action("Index", new { sortBy = column, sortOrder, searchTerm });
+    }
+
+    string GetSortIcon(string column)
+    {
+        if (ViewBag.SortBy != column) return "fa-sort";
+        return ViewBag.SortOrder == "asc" ? "fa-sort-up" : "fa-sort-down";
+    }
+    
+    string GetSortIndicator(string column)
+    {
+        if (ViewBag.SortBy != column) return "";
+        return ViewBag.SortOrder == "asc" ? "↑" : "↓";
+    }
+    
+    string GetSortDisplayName(string column)
+    {
+        return column switch
+        {
+            "Title" => "Job Title",
+            "ClientName" => "Client Name",
+            "Address" => "Address",
+            "ScheduledDate" => "Scheduled Date",
+            "Status" => "Status",
+            "AssignedCount" => "Assigned Employees",
+            _ => column
+        };
+    }
+
+    string HighlightSearchTerm(string text, string searchTerm)
+    {
+        if (string.IsNullOrEmpty(searchTerm) || string.IsNullOrEmpty(text))
+            return text;
+        
+        var escapedSearchTerm = System.Text.RegularExpressions.Regex.Escape(searchTerm);
+        var pattern = $"({escapedSearchTerm})";
+        var replacement = "<mark class=\"bg-warning\">$1</mark>";
+        
+        return System.Text.RegularExpressions.Regex.Replace(
+            text, 
+            pattern, 
+            replacement, 
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase
+        );
+    }
 }

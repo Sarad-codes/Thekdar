@@ -2,16 +2,41 @@
 @using Thekdar.Models
 @{
     ViewData["Title"] = $"Payslip - {Model.PayslipNumber}";
+    var autoPrint = ViewBag.AutoPrint as bool? ?? false;
 }
 
 <div class="container mt-4 mb-5">
-    <div class="d-flex justify-content-end gap-2 mb-3 no-print">
-        <button type="button" class="btn btn-primary" onclick="window.print()">
-            <i class="fas fa-print me-2"></i>Print
-        </button>
-        <a asp-action="History" class="btn btn-outline-secondary">
-            <i class="fas fa-arrow-left me-2"></i>Back
-        </a>
+    <div class="d-flex justify-content-end mb-3 no-print">
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                <i class="fas fa-cog me-2"></i>Actions
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                <li>
+                    <button type="button" class="dropdown-item" onclick="window.print()">
+                        <i class="fas fa-print text-primary me-2"></i>Print Payslip
+                    </button>
+                </li>
+                <li>
+                    <a asp-action="History" class="dropdown-item">
+                        <i class="fas fa-history text-secondary me-2"></i>Back to History
+                    </a>
+                </li>
+                <li>
+                    <a asp-action="Statistics" class="dropdown-item">
+                        <i class="fas fa-chart-bar text-info me-2"></i>View Statistics
+                    </a>
+                </li>
+                <li>
+                    <a asp-controller="Invoice" asp-action="Index" class="dropdown-item">
+                        <i class="fas fa-file-invoice-dollar text-success me-2"></i>Open Invoices
+                    </a>
+                </li>
+            </ul>
+        </div>
     </div>
 
     <div class="card border-0 shadow-lg">
@@ -254,3 +279,10 @@
         }
     }
 </style>
+
+@if (autoPrint)
+{
+    <script>
+        window.addEventListener('load', () => window.print());
+    </script>
+}

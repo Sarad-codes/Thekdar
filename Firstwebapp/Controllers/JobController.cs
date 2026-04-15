@@ -43,10 +43,85 @@ public class JobController : Controller
         return null;
     }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string sortBy = "ScheduledDate", string sortOrder = "desc", string searchTerm = "")
     {
-        var jobs = await _jobService.GetAllWithUsersAsync();
-        return View(jobs);
+        try
+        {
+            var jobs = await _jobService.GetAllWithUsersAsync();
+            
+            // Apply search filter
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                searchTerm = searchTerm.Trim();
+                jobs = jobs.Where(j => 
+                    (!string.IsNullOrEmpty(j.Title) && j.Title.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) ||
+                    (!string.IsNullOrEmpty(j.ClientName) && j.ClientName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) ||
+                    (!string.IsNullOrEmpty(j.Address) && j.Address.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                ).ToList();
+            }
+            
+            // Apply sorting
+            if (sortBy == "AssignedCount")
+            {
+                // Get assigned counts for all filtered jobs
+                var jobCounts = new Dictionary<int, int>();
+                foreach (var job in jobs)
+                {
+                    jobCounts[job.Id] = await _jobService.GetAssignedEmployeeCountAsync(job.Id);
+                }
+                
+                jobs = sortOrder == "asc"
+                    ? jobs.OrderBy(j => jobCounts.TryGetValue(j.Id, out var count) ? count : 0)
+                           .ThenBy(j => j.ScheduledDate)
+                           .ToList()
+                    : jobs.OrderByDescending(j => jobCounts.TryGetValue(j.Id, out var count) ? count : 0)
+                           .ThenByDescending(j => j.ScheduledDate)
+                           .ToList();
+            }
+            else
+            {
+                jobs = sortBy switch
+                {
+                    "Title" => sortOrder == "asc" 
+                        ? jobs.OrderBy(j => j.Title).ThenBy(j => j.ScheduledDate).ToList() 
+                        : jobs.OrderByDescending(j => j.Title).ThenByDescending(j => j.ScheduledDate).ToList(),
+                        
+                    "ClientName" => sortOrder == "asc" 
+                        ? jobs.OrderBy(j => j.ClientName).ThenBy(j => j.ScheduledDate).ToList() 
+                        : jobs.OrderByDescending(j => j.ClientName).ThenByDescending(j => j.ScheduledDate).ToList(),
+                        
+                    "Address" => sortOrder == "asc" 
+                        ? jobs.OrderBy(j => j.Address).ThenBy(j => j.ScheduledDate).ToList() 
+                        : jobs.OrderByDescending(j => j.Address).ThenByDescending(j => j.ScheduledDate).ToList(),
+                        
+                    "Status" => sortOrder == "asc" 
+                        ? jobs.OrderBy(j => j.Status).ThenBy(j => j.ScheduledDate).ToList() 
+                        : jobs.OrderByDescending(j => j.Status).ThenByDescending(j => j.ScheduledDate).ToList(),
+                        
+                    _ => sortOrder == "asc" 
+                        ? jobs.OrderBy(j => j.ScheduledDate).ToList() 
+                        : jobs.OrderByDescending(j => j.ScheduledDate).ToList()
+                };
+            }
+            
+            ViewBag.SortBy = sortBy;
+            ViewBag.SortOrder = sortOrder;
+            ViewBag.SearchTerm = searchTerm;
+            
+            return View(jobs);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error loading jobs index with search/sort. SortBy: {SortBy}, SortOrder: {SortOrder}, SearchTerm: {SearchTerm}", 
+                sortBy, sortOrder, searchTerm);
+            TempData["Error"] = "Error loading jobs. Please try again.";
+            
+            ViewBag.SortBy = sortBy;
+            ViewBag.SortOrder = sortOrder;
+            ViewBag.SearchTerm = searchTerm;
+            
+            return View(new List<JobModel>());
+        }
     }
 
     public async Task<IActionResult> Details(int? id)
@@ -187,8 +262,9 @@ public class JobController : Controller
         {
             TempData["Error"] = ex.Message;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Error marking job {JobId} as complete", id);
             TempData["Error"] = "Unable to update the job status right now.";
         }
 
@@ -212,8 +288,9 @@ public class JobController : Controller
         {
             TempData["Error"] = ex.Message;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Error confirming job {JobId} as complete", id);
             TempData["Error"] = "Unable to confirm the job right now.";
         }
 
@@ -247,8 +324,9 @@ public class JobController : Controller
         {
             TempData["Error"] = ex.Message;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Error deleting job {JobId}", id);
             TempData["Error"] = "Unable to delete the job right now.";
         }
 
@@ -375,16 +453,24 @@ public class JobController : Controller
     [Authorize(Roles = "Admin,Contractor")]
     public async Task<IActionResult> GetAssignedCount(int jobId)
     {
-        var job = await _jobService.GetByIdAsync(jobId);
-        if (job == null)
-            return NotFound();
+        try
+        {
+            var job = await _jobService.GetByIdAsync(jobId);
+            if (job == null)
+                return NotFound(new { count = 0 });
 
-        var denied = ForbidUnlessOwnsJob(job);
-        if (denied != null)
-            return denied;
+            var denied = ForbidUnlessOwnsJob(job);
+            if (denied != null)
+                return Json(new { count = 0 });
 
-        var count = await _jobService.GetAssignedEmployeeCountAsync(jobId);
-        return Json(new { count });
+            var count = await _jobService.GetAssignedEmployeeCountAsync(jobId);
+            return Json(new { count });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting assigned count for job {JobId}", jobId);
+            return Json(new { count = 0 });
+        }
     }
 
     [HttpPost]
@@ -408,8 +494,9 @@ public class JobController : Controller
         {
             TempData["Error"] = ex.Message;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Error unassigning employee {EmployeeId} from job {JobId}", employeeId, jobId);
             TempData["Error"] = "Unable to unassign the employee right now.";
         }
 
@@ -433,12 +520,12 @@ public class JobController : Controller
             await _jobService.UnassignAllEmployeesAsync(jobId);
             TempData["Success"] = "All employees unassigned successfully!";
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Error unassigning all employees from job {JobId}", jobId);
             TempData["Error"] = "Unable to unassign employees right now.";
         }
 
         return RedirectToAction(nameof(Details), new { id = jobId });
     }
 }
-

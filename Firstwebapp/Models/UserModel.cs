@@ -35,10 +35,10 @@ public class UserModel
     // 2FA - Simple email-based two-factor authentication
     public bool TwoFactorEnabled { get; set; } = false;
 
-    // Navigation â€” jobs this user created or completed
+    // Navigation  jobs this user created or completed
     public ICollection<JobModel> JobsCreated { get; set; } = new List<JobModel>();
     public ICollection<JobModel> JobsCompleted { get; set; } = new List<JobModel>();
     
-    // Navigation â€” employees this contractor manages
+    // Navigation  employees this contractor manages
     public ICollection<EmployeeModel> Employees { get; set; } = new List<EmployeeModel>();
 }

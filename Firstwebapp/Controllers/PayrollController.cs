@@ -47,7 +47,7 @@ public class PayrollController : Controller
         }
     }
 
-    public async Task<IActionResult> Payslip(int id)
+    public async Task<IActionResult> Payslip(int id, bool print = false)
     {
         try
         {
@@ -56,6 +56,7 @@ public class PayrollController : Controller
             if (!IsAdmin && payroll.ContractorId != CurrentUserId) return Forbid();
 
             var payslip = await _payrollService.GeneratePayslipAsync(id);
+            ViewBag.AutoPrint = print;
             return View(payslip);
         }
         catch (Exception ex)

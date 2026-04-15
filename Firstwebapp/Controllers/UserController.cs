@@ -19,7 +19,7 @@ namespace Thekdar.Controllers
             _authService = authService;
         }
 
-        // GET: /User/List â€” Admin only (contractors shouldn't see user list)
+        // GET: /User/List Admin only (contractors shouldn't see user list)
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> List(string filter = "All")
         {
@@ -42,7 +42,7 @@ namespace Thekdar.Controllers
             return View(users);
         }
 
-        // GET: /User/Details/{id} â€” Admin only
+        // GET: /User/Details/{id} Admin only
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Details(int id)
         {
@@ -51,14 +51,14 @@ namespace Thekdar.Controllers
             return View(user);
         }
 
-        // GET: /User/Register â€” Admin only
+        // GET: /User/Register Admin only
         [Authorize(Roles = "Admin")]
         public IActionResult Register()
         {
             return View();
         }
 
-        // POST: /User/Register â€” Admin only
+        // POST: /User/Register  Admin only
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Register(RegisterViewModel model)
@@ -90,7 +90,7 @@ namespace Thekdar.Controllers
             return View(model);
         }
 
-        // GET: /User/Edit/{id} â€” Admin only
+        // GET: /User/Edit/{id} Admin only
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id)
         {
@@ -113,7 +113,7 @@ namespace Thekdar.Controllers
             return View(model);
         }
 
-        // POST: /User/Edit/{id} â€” Admin only
+        // POST: /User/Edit/{id}  Admin only
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
@@ -141,7 +141,7 @@ namespace Thekdar.Controllers
             return View(model);
         }
 
-        // POST: /User/Deactivate/{id} â€” Admin only
+        // POST: /User/Deactivate/{id}  Admin only
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Deactivate(int id)
@@ -159,7 +159,7 @@ namespace Thekdar.Controllers
             return RedirectToAction("List");
         }
 
-        // POST: /User/Activate/{id} â€” Admin only
+        // POST: /User/Activate/{id}  Admin only
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Activate(int id)
