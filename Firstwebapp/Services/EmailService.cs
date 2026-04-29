@@ -57,6 +57,37 @@ public class EmailService : IEmailService
         await SendEmailAsync(toEmail, subject, body);
     }
 
+    public async Task SendMobileCredentialsEmailAsync(string toEmail, string workerName, string password)
+    {
+        
+            var subject = "Your Thekdar Mobile App Login Credentials";
+            var body = $@"
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset='utf-8'>
+            <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+            <title>Mobile App Login</title>
+        </head>
+        <body>
+            <p>Hello <strong>{workerName}</strong>,</p>
+            <p>You have been given mobile access for Thekdar.</p>
+            <p><strong>Login Credentials:</strong></p>
+            <ul>
+                <li><strong>Email:</strong> {toEmail}</li>
+                <li><strong>Password:</strong> {password}</li>
+            </ul>
+            <p>Open the Thekdar app on your phone and login with these credentials.</p>
+            <p>For security, you can change your password after logging in.</p>
+            <p>For support, contact your contractor.</p>
+            <p>Best regards,<br/>Thekdar Team</p>
+        </body>
+        </html>";
+
+            await SendEmailAsync(toEmail, subject, body);
+        
+    }
+
     public async Task SendJobAssignmentEmailAsync(string toEmail, string workerName, string jobTitle, string clientName, string address, DateTime? scheduledDate, string assignedBy, string role, DateTime assignedAt)
     {
         var subject = $"New Job Assignment: {jobTitle} - Thekdar";
@@ -121,5 +152,6 @@ public class EmailService : IEmailService
         {
             _logger.LogError(ex, "Failed to send email to {Email}", toEmail);
         }
+        
     }
 }

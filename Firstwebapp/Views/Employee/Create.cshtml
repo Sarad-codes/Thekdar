@@ -13,11 +13,13 @@
                 <div class="card-body">
                     <form asp-action="Create" method="post" enctype="multipart/form-data">
                         <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                        
+                        <input type="hidden" id="GeneratedPassword" name="generatedPassword" />
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label asp-for="FirstName" class="form-label fw-bold"></label>
-                                <input asp-for="FirstName" class="form-control" />
+                                <input asp-for="FirstName" class="form-control" id="FirstName" />
                                 <span asp-validation-for="FirstName" class="text-danger"></span>
                             </div>
                             <div class="col-md-6 mb-3">
@@ -62,7 +64,7 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label asp-for="Email" class="form-label fw-bold"></label>
-                                <input asp-for="Email" class="form-control" type="email" />
+                                <input asp-for="Email" class="form-control" type="email" id="Email" />
                                 <span asp-validation-for="Email" class="text-danger"></span>
                             </div>
                             <div class="col-md-6 mb-3">
@@ -100,6 +102,46 @@
                             </div>
                         </div>
 
+                        <!-- ========== MOBILE LOGIN SECTION ========== -->
+                        <div class="card mt-4 mb-4 border-primary">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0"><i class="fas fa-mobile-alt me-2"></i>Mobile App Access</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-check mb-3">
+                                    <input asp-for="MobileEnabled" class="form-check-input" id="MobileEnabledCheckbox" />
+                                    <label asp-for="MobileEnabled" class="form-check-label fw-bold">
+                                        Enable mobile app login
+                                    </label>
+                                    <small class="text-muted d-block">Allow this worker to login to the mobile app</small>
+                                </div>
+
+                                <div id="MobileCredentialsSection" style="display: none;">
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        Worker will receive login credentials via email when you save.
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <label class="form-label fw-bold">Mobile Password</label>
+                                            <div class="input-group">
+                                                <input type="text" id="MobilePassword" class="form-control" readonly />
+                                                <button type="button" id="GeneratePasswordBtn" class="btn btn-outline-secondary">
+                                                    <i class="fas fa-sync-alt"></i> Generate
+                                                </button>
+                                                <button type="button" id="CopyPasswordBtn" class="btn btn-outline-secondary">
+                                                    <i class="fas fa-copy"></i> Copy
+                                                </button>
+                                            </div>
+                                            <small class="text-muted">Auto-generated password. Worker can change it later in the app.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- ========== END MOBILE LOGIN SECTION ========== -->
+
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
                             <a asp-action="Index" class="btn btn-outline-secondary">
                                 <i class="fas fa-times me-2"></i>Cancel
@@ -117,4 +159,49 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        // Mobile login checkbox toggle
+        $('#MobileEnabledCheckbox').change(function() {
+            if ($(this).is(':checked')) {
+                $('#MobileCredentialsSection').slideDown();
+                generatePassword();
+            } else {
+                $('#MobileCredentialsSection').slideUp();
+            }
+        });
+        
+        // Generate password
+        function generatePassword() {
+            var firstName = $('#FirstName').val() || 'Worker';
+            var randomNum = Math.floor(Math.random() * 900 + 100);
+            var password = firstName + '@@' + randomNum;
+            $('#MobilePassword').val(password);
+            $('#GeneratedPassword').val(password);
+        }
+        
+        $('#GeneratePasswordBtn').click(function() {
+            generatePassword();
+        });
+        
+        // Copy password
+        $('#CopyPasswordBtn').click(function() {
+            var passwordInput = $('#MobilePassword');
+            passwordInput.select();
+            document.execCommand('copy');
+            
+            var btn = $(this);
+            btn.html('<i class="fas fa-check"></i> Copied!');
+            setTimeout(function() {
+                btn.html('<i class="fas fa-copy"></i> Copy');
+            }, 1500);
+        });
+        
+        // Regenerate password if first name changes while checkbox is checked
+        $('#FirstName').on('input', function() {
+            if ($('#MobileEnabledCheckbox').is(':checked')) {
+                generatePassword();
+            }
+        });
+    </script>
 }

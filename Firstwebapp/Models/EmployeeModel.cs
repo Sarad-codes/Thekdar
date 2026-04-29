@@ -40,7 +40,7 @@ public class EmployeeModel
     [Display(Name = "Daily Rate (NPR)")]
     [Column(TypeName = "decimal(18,2)")]
     [Range(100, 10000, ErrorMessage = "Daily rate must be between NPR 100 and 10,000")]
-    public decimal DailyRate { get; set; }  // Changed from HourlyRate to DailyRate
+    public decimal DailyRate { get; set; }
     
     [Display(Name = "Available for Work")]
     public bool IsAvailable { get; set; } = true;
@@ -59,6 +59,19 @@ public class EmployeeModel
     
     [Display(Name = "Deleted")]
     public bool IsDeleted { get; set; } = false;
+    
+    // ========== MOBILE APP ACCESS PROPERTIES ==========
+    
+    [Display(Name = "Enable mobile app login")]
+    public bool MobileEnabled { get; set; } = false;
+    
+    [Display(Name = "Mobile Password Hash")]
+    public string? MobilePasswordHash { get; set; }
+    
+    [Display(Name = "Last Mobile Login")]
+    public DateTime? LastMobileLogin { get; set; }
+    
+    // ========== END MOBILE APP ACCESS PROPERTIES ==========
     
     public int ContractorId { get; set; }
     

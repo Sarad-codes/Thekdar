@@ -11,11 +11,13 @@ namespace Thekdar.Controllers;
 public class EmployeeController : Controller
 {
     private readonly IEmployeeService _employeeService;
+    private readonly IEmailService _emailService;
     private readonly ILogger<EmployeeController> _logger;
 
-    public EmployeeController(IEmployeeService employeeService, ILogger<EmployeeController> logger)
+    public EmployeeController(IEmployeeService employeeService, IEmailService emailService, ILogger<EmployeeController> logger)
     {
         _employeeService = employeeService;
+        _emailService = emailService;
         _logger = logger;
     }
 
@@ -60,7 +62,6 @@ public class EmployeeController : Controller
             var denied = ForbidUnlessOwnsEmployee(employee);
             if (denied != null) return denied;
 
-            // Deleted workers are managed through the edit screen so they can be fixed or reactivated.
             return RedirectToAction(nameof(Edit), new { id = employee.Id });
         }
 
@@ -74,7 +75,7 @@ public class EmployeeController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(EmployeeViewModel model)
+    public async Task<IActionResult> Create(EmployeeViewModel model, string generatedPassword)
     {
         if (!ModelState.IsValid)
         {
@@ -93,7 +94,16 @@ public class EmployeeController : Controller
         
         try
         {
-            await _employeeService.CreateAsync(model, contractorId);
+            var employee = await _employeeService.CreateAsync(model, contractorId);
+            
+            // If mobile access is enabled, send credentials
+            if (model.MobileEnabled && !string.IsNullOrEmpty(generatedPassword))
+            {
+                await _employeeService.EnableMobileAccessAsync(employee.Id, generatedPassword);
+                await _emailService.SendMobileCredentialsEmailAsync(employee.Email, employee.FullName, generatedPassword);
+                TempData["Info"] = "Mobile login credentials sent to worker's email.";
+            }
+            
             TempData["Success"] = "Employee added successfully!";
             return RedirectToAction(nameof(Index));
         }
@@ -127,7 +137,15 @@ public class EmployeeController : Controller
         var denied = ForbidUnlessOwnsEmployee(employee);
         if (denied != null) return denied;
 
-        return View(MapToViewModel(employee));
+        var viewModel = MapToViewModel(employee);
+        
+        // Generate a new password for display if mobile is enabled
+        if (viewModel.MobileEnabled && string.IsNullOrEmpty(viewModel.GeneratedPassword))
+        {
+            viewModel.GeneratedPassword = GenerateRandomPassword(viewModel.FirstName);
+        }
+        
+        return View(viewModel);
     }
 
     [HttpPost]
@@ -236,6 +254,81 @@ public class EmployeeController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    // ========== MOBILE ACCESS ACTIONS ==========
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> SendMobileCredentials(int id, string password)
+    {
+        try
+        {
+            var employee = await _employeeService.GetByIdAsync(id);
+            if (employee == null)
+                return Json(new { success = false, message = "Worker not found" });
+            
+            if (string.IsNullOrEmpty(employee.Email))
+                return Json(new { success = false, message = "Worker must have an email address to receive credentials." });
+            
+            await _employeeService.EnableMobileAccessAsync(id, password);
+            await _emailService.SendMobileCredentialsEmailAsync(employee.Email, employee.FullName, password);
+            
+            return Json(new { success = true });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error sending mobile credentials for employee {EmployeeId}", id);
+            return Json(new { success = false, message = ex.Message });
+        }
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ResetMobilePassword(int id, string password)
+    {
+        try
+        {
+            var employee = await _employeeService.GetByIdAsync(id);
+            if (employee == null)
+                return Json(new { success = false, message = "Worker not found" });
+    
+            if (string.IsNullOrEmpty(employee.Email))
+                return Json(new { success = false, message = "Worker must have an email address." });
+    
+            await _employeeService.EnableMobileAccessAsync(id, password);
+            await _emailService.SendMobileCredentialsEmailAsync(employee.Email, employee.FullName, password);
+    
+            return Json(new { success = true });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error resetting mobile password for employee {EmployeeId}", id);
+            return Json(new { success = false, message = ex.Message });
+        }
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> RevokeMobileAccess(int id)
+    {
+        try
+        {
+            var employee = await _employeeService.GetByIdAsync(id);
+            if (employee == null)
+                return Json(new { success = false, message = "Worker not found" });
+            
+            await _employeeService.DisableMobileAccessAsync(id);
+            
+            return Json(new { success = true });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error revoking mobile access for employee {EmployeeId}", id);
+            return Json(new { success = false, message = ex.Message });
+        }
+    }
+
+    // ========== HELPER METHODS ==========
+
     private async Task<List<EmployeeModel>> GetEmployeesForFilterAsync(string filter)
     {
         return filter switch
@@ -248,7 +341,13 @@ public class EmployeeController : Controller
 
     private static string GetListFilter(EmployeeModel employee) => employee.IsDeleted ? "Deleted" : "Active";
 
-    private static EmployeeViewModel MapToViewModel(EmployeeModel employee)
+    private string GenerateRandomPassword(string firstName)
+    {
+        var randomNum = new Random().Next(100, 999);
+        return $"{firstName}@{randomNum}";
+    }
+
+    private EmployeeViewModel MapToViewModel(EmployeeModel employee)
     {
         return new EmployeeViewModel
         {
@@ -267,7 +366,14 @@ public class EmployeeController : Controller
             ExistingPanCardPath = employee.PanCardImagePath,
             ExistingProfilePicturePath = employee.ProfilePicturePath,
             ContractorId = employee.ContractorId,
-            ContractorName = employee.Contractor?.Name
+            ContractorName = employee.Contractor?.Name,
+            
+            // ========== MOBILE ACCESS PROPERTIES ==========
+            MobileEnabled = employee.MobileEnabled,
+            MobileEnabledWas = employee.MobileEnabled,
+            LastMobileLogin = employee.LastMobileLogin?.ToString("MMM dd, yyyy h:mm tt") ?? "Never",
+            MobilePasswordHash = employee.MobilePasswordHash,
+            GeneratedPassword = employee.MobileEnabled ? GenerateRandomPassword(employee.FirstName) : null
         };
     }
 }

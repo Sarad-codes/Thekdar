@@ -41,7 +41,7 @@ public class EmployeeViewModel
     [Display(Name = "Daily Rate (NPR)")]
     [Range(100, 10000, ErrorMessage = "Daily rate must be between NPR 100 and 10,000")]
     [DataType(DataType.Currency)]
-    public decimal DailyRate { get; set; }  // Changed from HourlyRate to DailyRate
+    public decimal DailyRate { get; set; }
     
     [Display(Name = "Available for Work")]
     public bool IsAvailable { get; set; } = true;
@@ -73,4 +73,23 @@ public class EmployeeViewModel
     public MultiSelectList? AvailableJobsList { get; set; }
     
     public List<EmployeeJobAssignmentViewModel>? CurrentAssignments { get; set; }
+
+    // ========== MOBILE APP ACCESS PROPERTIES ==========
+    
+    [Display(Name = "Enable mobile app login")]
+    public bool MobileEnabled { get; set; } = false;
+    
+    // Used to track if mobile was previously enabled (for UI)
+    public bool MobileEnabledWas { get; set; } = false;
+    
+    // Auto-generated password (not stored in DB, only for UI display)
+    [Display(Name = "Mobile Password")]
+    public string? GeneratedPassword { get; set; }
+    
+    // Last timeworker logged into mobile app
+    [Display(Name = "Last Mobile Login")]
+    public string? LastMobileLogin { get; set; }
+    
+    // Mobile password hash (stored in DB)
+    public string? MobilePasswordHash { get; set; }
 }

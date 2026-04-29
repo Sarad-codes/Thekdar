@@ -36,4 +36,5 @@ public class ApplicationDbContext : DbContext
     public DbSet<EmployeeModel> Employees { get; set; }
     public DbSet<JobAssignmentModel> JobAssignments { get; set; }
     public DbSet<PayrollModel> Payrolls { get; set; }
+    public DbSet<MobileAttendance> MobileAttendances { get; set; }
 }
