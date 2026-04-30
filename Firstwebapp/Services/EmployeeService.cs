@@ -75,6 +75,10 @@ namespace Thekdar.Services
                 if (model.DailyRate <= 0)
                     throw new ArgumentException("Daily rate must be greater than 0");
                 
+                // Validate daily rate is multiple of 100
+                if (model.DailyRate % 100 != 0)
+                    throw new ArgumentException("Daily rate must be in multiples of 100 NPR");
+                
                 // Validate primary phone (required)
                 if (string.IsNullOrWhiteSpace(model.Phone))
                     throw new ArgumentException("Primary phone is required");
@@ -140,7 +144,8 @@ namespace Thekdar.Services
                     ProfilePicturePath = profilePath,
                     HireDate = hireDateUtc,
                     ContractorId = contractorId,
-                    IsDeleted = false
+                    IsDeleted = false,
+                    MobileEnabled = model.MobileEnabled
                 };
 
                 _context.Employees.Add(employee);
@@ -181,6 +186,10 @@ namespace Thekdar.Services
                     throw new ArgumentException("Primary phone is required");
                 if (!System.Text.RegularExpressions.Regex.IsMatch(model.Phone, @"^\d{10}$"))
                     throw new ArgumentException("Primary phone must be exactly 10 digits");
+
+                // Validate daily rate is multiple of 100
+                if (model.DailyRate % 100 != 0)
+                    throw new ArgumentException("Daily rate must be in multiples of 100 NPR");
 
                 // Validate secondary phone ONLY if provided (optional)
                 if (!string.IsNullOrEmpty(model.Phone2) && !System.Text.RegularExpressions.Regex.IsMatch(model.Phone2, @"^\d{10}$"))
@@ -240,6 +249,9 @@ namespace Thekdar.Services
                 existing.IsAvailable = existing.IsDeleted ? false : model.IsAvailable;
                 existing.PanNumber = normalizedPanNumber;
                 existing.HireDate = hireDateUtc;
+                
+                // FIX: Save mobile access setting
+                existing.MobileEnabled = model.MobileEnabled;
 
                 await _context.SaveChangesAsync().ConfigureAwait(false);
                 _logger.LogInformation($"Employee updated: {model.Id} with daily rate NPR {existing.DailyRate}");
@@ -273,7 +285,6 @@ namespace Thekdar.Services
                     return;
                 }
 
-                // Get and remove all active assignments
                 var activeAssignments = await _context.JobAssignments
                     .Where(a => a.EmployeeId == id && a.Status != "Completed")
                     .ToListAsync()
@@ -490,14 +501,12 @@ namespace Thekdar.Services
 
             try
             {
-                // Validate file size (max 5MB)
                 if (image.Length > 5 * 1024 * 1024)
                 {
                     _logger.LogWarning($"Image too large: {image.Length} bytes");
                     throw new InvalidOperationException("Image file size must be less than 5MB.");
                 }
 
-                // Validate file type
                 var allowedTypes = new[] { "image/jpeg", "image/png", "image/gif", "image/webp" };
                 if (!allowedTypes.Contains(image.ContentType.ToLower()))
                 {
@@ -638,111 +647,110 @@ namespace Thekdar.Services
             message = string.Empty;
             return false;
         }
+
         // ========== MOBILE ACCESS METHOD IMPLEMENTATIONS ==========
 
-public async Task<bool> EnableMobileAccessAsync(int employeeId, string password)
-{
-    try
-    {
-        var employee = await _context.Employees
-            .IgnoreQueryFilters()
-            .FirstOrDefaultAsync(e => e.Id == employeeId);
-            
-        if (employee == null) return false;
-        
-        if (string.IsNullOrWhiteSpace(employee.Email))
-            throw new InvalidOperationException("Worker must have an email address to enable mobile access.");
-        
-        employee.MobilePasswordHash = BCrypt.Net.BCrypt.HashPassword(password);
-        employee.MobileEnabled = true;
-        
-        await _context.SaveChangesAsync();
-        _logger.LogInformation($"Mobile access enabled for employee {employeeId}");
-        return true;
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError(ex, $"Error enabling mobile access for employee {employeeId}");
-        throw;
-    }
-}
-
-public async Task<bool> DisableMobileAccessAsync(int employeeId)
-{
-    try
-    {
-        var employee = await _context.Employees
-            .IgnoreQueryFilters()
-            .FirstOrDefaultAsync(e => e.Id == employeeId);
-            
-        if (employee == null) return false;
-        
-        employee.MobileEnabled = false;
-        employee.MobilePasswordHash = null;
-        
-        await _context.SaveChangesAsync();
-        _logger.LogInformation($"Mobile access disabled for employee {employeeId}");
-        return true;
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError(ex, $"Error disabling mobile access for employee {employeeId}");
-        throw;
-    }
-}
-
-public async Task UpdateLastMobileLoginAsync(int employeeId)
-{
-    try
-    {
-        var employee = await _context.Employees.FindAsync(employeeId);
-        if (employee != null)
+        public async Task<bool> EnableMobileAccessAsync(int employeeId, string password)
         {
-            employee.LastMobileLogin = DateTime.UtcNow;
-            await _context.SaveChangesAsync();
+            try
+            {
+                var employee = await _context.Employees
+                    .IgnoreQueryFilters()
+                    .FirstOrDefaultAsync(e => e.Id == employeeId);
+                    
+                if (employee == null) return false;
+                
+                if (string.IsNullOrWhiteSpace(employee.Email))
+                    throw new InvalidOperationException("Worker must have an email address to enable mobile access.");
+                
+                employee.MobilePasswordHash = BCrypt.Net.BCrypt.HashPassword(password);
+                employee.MobileEnabled = true;
+                
+                await _context.SaveChangesAsync();
+                _logger.LogInformation($"Mobile access enabled for employee {employeeId}");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error enabling mobile access for employee {employeeId}");
+                throw;
+            }
+        }
+
+        public async Task<bool> DisableMobileAccessAsync(int employeeId)
+        {
+            try
+            {
+                var employee = await _context.Employees
+                    .IgnoreQueryFilters()
+                    .FirstOrDefaultAsync(e => e.Id == employeeId);
+                    
+                if (employee == null) return false;
+                
+                employee.MobileEnabled = false;
+                employee.MobilePasswordHash = null;
+                
+                await _context.SaveChangesAsync();
+                _logger.LogInformation($"Mobile access disabled for employee {employeeId}");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error disabling mobile access for employee {employeeId}");
+                throw;
+            }
+        }
+
+        public async Task UpdateLastMobileLoginAsync(int employeeId)
+        {
+            try
+            {
+                var employee = await _context.Employees.FindAsync(employeeId);
+                if (employee != null)
+                {
+                    employee.LastMobileLogin = DateTime.UtcNow;
+                    await _context.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error updating last mobile login for employee {employeeId}");
+            }
+        }
+
+        public async Task<EmployeeModel?> GetByEmailForMobileAsync(string email)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(email)) return null;
+                
+                var normalizedEmail = email.Trim().ToLowerInvariant();
+                
+                return await _context.Employees
+                    .FirstOrDefaultAsync(e => e.Email != null && e.Email.ToLower() == normalizedEmail && e.MobileEnabled == true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error getting employee by email for mobile: {email}");
+                return null;
+            }
+        }
+
+        public async Task<bool> VerifyMobilePasswordAsync(string email, string password)
+        {
+            try
+            {
+                var employee = await GetByEmailForMobileAsync(email);
+                if (employee == null || string.IsNullOrEmpty(employee.MobilePasswordHash))
+                    return false;
+                
+                return BCrypt.Net.BCrypt.Verify(password, employee.MobilePasswordHash);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error verifying mobile password for email: {email}");
+                return false;
+            }
         }
     }
-    catch (Exception ex)
-    {
-        _logger.LogError(ex, $"Error updating last mobile login for employee {employeeId}");
-    }
 }
-
-public async Task<EmployeeModel?> GetByEmailForMobileAsync(string email)
-{
-    try
-    {
-        if (string.IsNullOrWhiteSpace(email)) return null;
-        
-        var normalizedEmail = email.Trim().ToLowerInvariant();
-        
-        return await _context.Employees
-            .FirstOrDefaultAsync(e => e.Email != null && e.Email.ToLower() == normalizedEmail && e.MobileEnabled == true);
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError(ex, $"Error getting employee by email for mobile: {email}");
-        return null;
-    }
-}
-
-public async Task<bool> VerifyMobilePasswordAsync(string email, string password)
-{
-    try
-    {
-        var employee = await GetByEmailForMobileAsync(email);
-        if (employee == null || string.IsNullOrEmpty(employee.MobilePasswordHash))
-            return false;
-        
-        return BCrypt.Net.BCrypt.Verify(password, employee.MobilePasswordHash);
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError(ex, $"Error verifying mobile password for email: {email}");
-        return false;
-    }
-}
-    }
-    
-}
-

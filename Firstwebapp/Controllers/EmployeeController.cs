@@ -346,7 +346,6 @@ public class EmployeeController : Controller
         var randomNum = new Random().Next(100, 999);
         return $"{firstName}@{randomNum}";
     }
-
     private EmployeeViewModel MapToViewModel(EmployeeModel employee)
     {
         return new EmployeeViewModel
@@ -367,7 +366,7 @@ public class EmployeeController : Controller
             ExistingProfilePicturePath = employee.ProfilePicturePath,
             ContractorId = employee.ContractorId,
             ContractorName = employee.Contractor?.Name,
-            
+        
             // ========== MOBILE ACCESS PROPERTIES ==========
             MobileEnabled = employee.MobileEnabled,
             MobileEnabledWas = employee.MobileEnabled,

@@ -134,6 +134,8 @@ public class EmailService : IEmailService
             var fromName = _configuration["EmailSettings:FromName"];
             var enableSsl = bool.Parse(_configuration["EmailSettings:EnableSsl"]!);
 
+            _logger.LogInformation($"Sending email to {toEmail} via {smtpServer}:{smtpPort}");
+
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress(fromName, fromEmail));
             message.To.Add(new MailboxAddress(string.Empty, toEmail));
@@ -146,12 +148,13 @@ public class EmailService : IEmailService
             await client.SendAsync(message);
             await client.DisconnectAsync(true);
 
-            _logger.LogInformation("Email sent to {Email}", toEmail);
+            _logger.LogInformation("Email sent successfully to {Email}", toEmail);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to send email to {Email}", toEmail);
+            _logger.LogError(ex, "Failed to send email to {Email}. Error: {Message}", toEmail, ex.Message);
+            throw; // Re-throw so caller knows it failed
         }
-        
     }
+    
 }

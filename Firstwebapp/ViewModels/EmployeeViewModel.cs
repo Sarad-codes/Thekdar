@@ -40,6 +40,7 @@ public class EmployeeViewModel
     [Required(ErrorMessage = "Daily rate is required")]
     [Display(Name = "Daily Rate (NPR)")]
     [Range(100, 10000, ErrorMessage = "Daily rate must be between NPR 100 and 10,000")]
+    [RegularExpression(@"^\d+$", ErrorMessage = "Daily rate must be a whole number (multiples of 100)")]
     [DataType(DataType.Currency)]
     public decimal DailyRate { get; set; }
     
