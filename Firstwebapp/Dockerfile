@@ -5,11 +5,14 @@ EXPOSE 10000
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Now we are already inside Firstwebapp
-COPY Firstwebapp.csproj .
-RUN dotnet restore Firstwebapp.csproj
+# Copy ONLY project file first
+COPY Firstwebapp/Firstwebapp.csproj Firstwebapp/
+RUN dotnet restore Firstwebapp/Firstwebapp.csproj
 
+# Copy rest of the code
 COPY . .
+WORKDIR /src/Firstwebapp
+
 RUN dotnet publish -c Release -o /app/publish
 
 FROM base AS final
