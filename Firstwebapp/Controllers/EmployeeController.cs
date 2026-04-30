@@ -281,30 +281,59 @@ public class EmployeeController : Controller
         }
     }
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> ResetMobilePassword(int id, string password)
+   [HttpPost]
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> ResetMobilePassword(int id, string password)
+{
+    try
     {
+        _logger.LogInformation($"=== RESET MOBILE PASSWORD START ===");
+        _logger.LogInformation($"Employee ID: {id}");
+        
+        var employee = await _employeeService.GetByIdAsync(id);
+        if (employee == null)
+        {
+            _logger.LogWarning($"Employee not found: {id}");
+            return Json(new { success = false, message = "Worker not found" });
+        }
+    
+        if (string.IsNullOrEmpty(employee.Email))
+        {
+            _logger.LogWarning($"Employee has no email: {id}");
+            return Json(new { success = false, message = "Worker must have an email address." });
+        }
+        
+        _logger.LogInformation($"Employee found: {employee.Email}");
+        
+        // Step 1: Enable mobile access (save password hash)
+        _logger.LogInformation($"Enabling mobile access...");
+        await _employeeService.EnableMobileAccessAsync(id, password);
+        _logger.LogInformation($"Mobile access enabled successfully");
+        
+        // Step 2: Send email
+        _logger.LogInformation($"Attempting to send email to {employee.Email}...");
+        
         try
         {
-            var employee = await _employeeService.GetByIdAsync(id);
-            if (employee == null)
-                return Json(new { success = false, message = "Worker not found" });
-    
-            if (string.IsNullOrEmpty(employee.Email))
-                return Json(new { success = false, message = "Worker must have an email address." });
-    
-            await _employeeService.EnableMobileAccessAsync(id, password);
             await _emailService.SendMobileCredentialsEmailAsync(employee.Email, employee.FullName, password);
-    
-            return Json(new { success = true });
+            _logger.LogInformation($"Email sent successfully to {employee.Email}");
         }
-        catch (Exception ex)
+        catch (Exception emailEx)
         {
-            _logger.LogError(ex, "Error resetting mobile password for employee {EmployeeId}", id);
-            return Json(new { success = false, message = ex.Message });
+            _logger.LogError(emailEx, $"EMAIL FAILED: {emailEx.Message}");
+            // Still return success because password was saved, but tell user email failed
+            return Json(new { success = true, warning = true, message = $"Password saved but email failed: {emailEx.Message}" });
         }
+    
+        _logger.LogInformation($"=== RESET MOBILE PASSWORD SUCCESS ===");
+        return Json(new { success = true, message = $"Password reset and sent to {employee.Email}" });
     }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, $"=== RESET MOBILE PASSWORD FAILED ===");
+        return Json(new { success = false, message = ex.Message });
+    }
+}
 
     [HttpPost]
     [ValidateAntiForgeryToken]

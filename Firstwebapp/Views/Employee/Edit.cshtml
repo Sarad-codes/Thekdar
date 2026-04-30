@@ -265,23 +265,22 @@
                 btn.html('<i class="fas fa-copy"></i> Copy');
             }, 1500);
         });
-        
-        // Reset Password & Send
+
         $('#ResetPasswordBtn').click(function() {
             var workerId = $('#Id').val();
             var newPassword = $('#MobilePassword').val();
             var email = $('#Email').val();
-            
+
             if (!email) {
                 alert('Worker must have an email address to receive credentials.');
                 return;
             }
-            
+
             if (!newPassword) {
                 generatePassword();
                 newPassword = $('#MobilePassword').val();
             }
-            
+
             if (confirm('Send new password to ' + email + '?')) {
                 $.ajax({
                     url: '@Url.Action("ResetMobilePassword", "Employee")',
@@ -292,21 +291,26 @@
                     },
                     success: function(response) {
                         if (response.success) {
+                            if (response.warning) {
+                                alert('⚠️ ' + response.message);
+                            } else {
+                                alert('✅ ' + response.message);
+                            }
                             $('#EmailSentMessage').slideDown();
                             setTimeout(function() {
                                 $('#EmailSentMessage').slideUp();
                             }, 3000);
                             $('#MobilePassword').val('');
                         } else {
-                            alert('Failed to send email: ' + response.message);
+                            alert('❌ Error: ' + response.message);
                         }
                     },
-                    error: function() {
-                        alert('An error occurred. Please try again.');
+                    error: function(xhr) {
+                        alert('❌ Server error: ' + xhr.status + ' - ' + xhr.statusText);
                     }
                 });
             }
-        });
+});
         
         // Revoke access button
         $('#RevokeAccessBtn').click(function() {
