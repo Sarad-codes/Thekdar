@@ -1,7 +1,9 @@
-﻿using Thekdar.Services.Interface;
-using MailKit.Net.Smtp;
-using MailKit.Security;
-using MimeKit;
+﻿using brevo_csharp.Api;
+using brevo_csharp.Client;
+using brevo_csharp.Model;
+using Thekdar.Services.Interface;
+using Configuration = brevo_csharp.Client.Configuration;
+using Task = System.Threading.Tasks.Task;
 
 namespace Thekdar.Services;
 
@@ -20,56 +22,27 @@ public class EmailService : IEmailService
     {
         var subject = "Reset Your Password - Thekdar";
         var body = $@"
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset='utf-8'>
-                <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-                <title>Password Reset</title>
-            </head>
-            <body>
-                <p>Hello <strong>{userName}</strong>,</p>
-                <p>We received a request to reset your password for your Thekdar account.</p>
-                <p><a href='{resetLink}'>Reset Password</a></p>
-            </body>
-            </html>";
+            <p>Hello <strong>{userName}</strong>,</p>
+            <p>We received a request to reset your password for your Thekdar account.</p>
+            <p><a href='{resetLink}'>Reset Password</a></p>";
 
-        await SendEmailAsync(toEmail, subject, body);
+        await SendEmailViaBrevoAsync(toEmail, userName, subject, body);
     }
 
     public async Task SendTwoFactorCodeAsync(string toEmail, string code, string userName)
     {
         var subject = "Your Two-Factor Authentication Code - Thekdar";
         var body = $@"
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset='utf-8'>
-                <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-                <title>2FA Code</title>
-            </head>
-            <body>
-                <p>Hello <strong>{userName}</strong>,</p>
-                <p>Use this code to complete your login: <strong>{code}</strong></p>
-            </body>
-            </html>";
+            <p>Hello <strong>{userName}</strong>,</p>
+            <p>Use this code to complete your login: <strong>{code}</strong></p>";
 
-        await SendEmailAsync(toEmail, subject, body);
+        await SendEmailViaBrevoAsync(toEmail, userName, subject, body);
     }
 
     public async Task SendMobileCredentialsEmailAsync(string toEmail, string workerName, string password)
     {
-        
-            var subject = "Your Thekdar Mobile App Login Credentials";
-            var body = $@"
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset='utf-8'>
-            <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-            <title>Mobile App Login</title>
-        </head>
-        <body>
+        var subject = "Your Thekdar Mobile App Login Credentials";
+        var body = $@"
             <p>Hello <strong>{workerName}</strong>,</p>
             <p>You have been given mobile access for Thekdar.</p>
             <p><strong>Login Credentials:</strong></p>
@@ -80,12 +53,9 @@ public class EmailService : IEmailService
             <p>Open the Thekdar app on your phone and login with these credentials.</p>
             <p>For security, you can change your password after logging in.</p>
             <p>For support, contact your contractor.</p>
-            <p>Best regards,<br/>Thekdar Team</p>
-        </body>
-        </html>";
+            <p>Best regards,<br/>Thekdar Team</p>";
 
-            await SendEmailAsync(toEmail, subject, body);
-        
+        await SendEmailViaBrevoAsync(toEmail, workerName, subject, body);
     }
 
     public async Task SendJobAssignmentEmailAsync(string toEmail, string workerName, string jobTitle, string clientName, string address, DateTime? scheduledDate, string assignedBy, string role, DateTime assignedAt)
@@ -97,64 +67,75 @@ public class EmailService : IEmailService
         var assignedAtFormatted = assignedAt.ToLocalTime().ToString("dddd, MMMM dd, yyyy h:mm tt");
 
         var body = $@"
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset='utf-8'>
-                <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-                <title>Job Assignment</title>
-            </head>
-            <body>
-                <p>Hello <strong>{workerName}</strong>,</p>
-                <p>You have been assigned to a new job.</p>
-                <ul>
-                    <li><strong>Job Title:</strong> {jobTitle}</li>
-                    <li><strong>Client:</strong> {clientName}</li>
-                    <li><strong>Location:</strong> {address}</li>
-                    <li><strong>Scheduled Date:</strong> {scheduledDateFormatted}</li>
-                    <li><strong>Role:</strong> {role}</li>
-                    <li><strong>Assigned By:</strong> {assignedBy}</li>
-                    <li><strong>Assigned At:</strong> {assignedAtFormatted}</li>
-                </ul>
-            </body>
-            </html>";
+            <p>Hello <strong>{workerName}</strong>,</p>
+            <p>You have been assigned to a new job.</p>
+            <ul>
+                <li><strong>Job Title:</strong> {jobTitle}</li>
+                <li><strong>Client:</strong> {clientName}</li>
+                <li><strong>Location:</strong> {address}</li>
+                <li><strong>Scheduled Date:</strong> {scheduledDateFormatted}</li>
+                <li><strong>Role:</strong> {role}</li>
+                <li><strong>Assigned By:</strong> {assignedBy}</li>
+                <li><strong>Assigned At:</strong> {assignedAtFormatted}</li>
+            </ul>
+            <p>Best regards,<br/>Thekdar Team</p>";
 
-        await SendEmailAsync(toEmail, subject, body);
+        await SendEmailViaBrevoAsync(toEmail, workerName, subject, body);
     }
 
-    private async Task SendEmailAsync(string toEmail, string subject, string body)
+    private async Task SendEmailViaBrevoAsync(string toEmail, string toName, string subject, string htmlBody)
     {
         try
         {
-            var smtpServer = _configuration["EmailSettings:SmtpServer"];
-            var smtpPort = int.Parse(_configuration["EmailSettings:SmtpPort"]!);
-            var smtpUsername = _configuration["EmailSettings:SmtpUsername"];
-            var smtpPassword = _configuration["EmailSettings:SmtpPassword"];
-            var fromEmail = _configuration["EmailSettings:FromEmail"];
-            var fromName = _configuration["EmailSettings:FromName"];
-            var enableSsl = bool.Parse(_configuration["EmailSettings:EnableSsl"]!);
+            var apiKey = _configuration["Brevo:ApiKey"];
+            var fromEmail = _configuration["Brevo:FromEmail"] ?? "noreplythaekdar@gmail.com";
+            var fromName = _configuration["Brevo:FromName"] ?? "Thekdar";
 
-            _logger.LogInformation($"Sending email to {toEmail} via {smtpServer}:{smtpPort}");
+            if (string.IsNullOrEmpty(apiKey))
+            {
+                _logger.LogError("Brevo API key is missing from configuration");
+                throw new Exception("Email service not configured");
+            }
 
-            var message = new MimeMessage();
-            message.From.Add(new MailboxAddress(fromName, fromEmail));
-            message.To.Add(new MailboxAddress(string.Empty, toEmail));
-            message.Subject = subject;
-            message.Body = new BodyBuilder { HtmlBody = body }.ToMessageBody();
+            // Configure Brevo API
+            Configuration.Default.ApiKey.Clear();
+            Configuration.Default.ApiKey.Add("api-key", apiKey);
 
-            using var client = new SmtpClient();
-            await client.ConnectAsync(smtpServer, smtpPort, enableSsl ? SecureSocketOptions.StartTls : SecureSocketOptions.Auto);
-            await client.AuthenticateAsync(smtpUsername, smtpPassword);
-            await client.SendAsync(message);
-            await client.DisconnectAsync(true);
+            var apiInstance = new TransactionalEmailsApi();
+            
+            var sender = new SendSmtpEmailSender(fromName, fromEmail);
+            var to = new List<SendSmtpEmailTo> { new SendSmtpEmailTo(toEmail, toName) };
+            
+            var sendSmtpEmail = new SendSmtpEmail(
+                sender: sender,
+                to: to,
+                subject: subject,
+                htmlContent: $@"
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta charset='utf-8'>
+                        <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+                        <title>{subject}</title>
+                    </head>
+                    <body style='font-family: Arial, sans-serif; padding: 20px;'>
+                        {htmlBody}
+                        <hr/>
+                        <p style='color: #888; font-size: 12px;'>Thekdar - Contractor Management System</p>
+                    </body>
+                    </html>"
+            );
 
-            _logger.LogInformation("Email sent successfully to {Email}", toEmail);
+            var response = await apiInstance.SendTransacEmailAsync(sendSmtpEmail);
+            
+            _logger.LogInformation("Email sent successfully to {Email} via Brevo. MessageId: {MessageId}", 
+                toEmail, response.MessageId);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to send email to {Email}. Error: {Message}", toEmail, ex.Message);
-            throw; // Re-throw so caller knows it failed
+            _logger.LogError(ex, "Failed to send email to {Email} via Brevo. Error: {Message}", 
+                toEmail, ex.Message);
+            throw;
         }
     }
-    
 }
