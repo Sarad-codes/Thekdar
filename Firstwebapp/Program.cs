@@ -48,9 +48,9 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
             ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? "ThekdarAPI",
-            ValidAudience = builder.Configuration["Jwt:Audience"] ?? "ThekdarMobileApp",
+            ValidAudience = builder.Configuration["Jwt:Audience"] ?? "Thekdar",
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? "your-super-secret-key-here-at-least-32-characters-long"))
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? "Thekdar2024SuperSecureKeyThatIsAtLeastSixtyFourCharactersLongAndNeverSharedInCode!@#$%"))
         };
         
         // Customize JWT challenge response for mobile API
