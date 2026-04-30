@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Thekdar")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6802c2278e872fcf89c03344e72b39466105c9c5")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ad76421726b4af9560af7fcfe8feb99a6cf855be")]
 [assembly: System.Reflection.AssemblyProductAttribute("Thekdar")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Thekdar")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
