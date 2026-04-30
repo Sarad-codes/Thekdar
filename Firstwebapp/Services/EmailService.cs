@@ -24,7 +24,8 @@ public class EmailService : IEmailService
         var body = $@"
             <p>Hello <strong>{userName}</strong>,</p>
             <p>We received a request to reset your password for your Thekdar account.</p>
-            <p><a href='{resetLink}'>Reset Password</a></p>";
+            <p><a href='{resetLink}'>Reset Password</a></p>
+            <p>If you didn't request this, please ignore this email.</p>";
 
         await SendEmailViaBrevoAsync(toEmail, userName, subject, body);
     }
@@ -34,7 +35,8 @@ public class EmailService : IEmailService
         var subject = "Your Two-Factor Authentication Code - Thekdar";
         var body = $@"
             <p>Hello <strong>{userName}</strong>,</p>
-            <p>Use this code to complete your login: <strong>{code}</strong></p>";
+            <p>Use this code to complete your login: <strong>{code}</strong></p>
+            <p>This code expires in 10 minutes.</p>";
 
         await SendEmailViaBrevoAsync(toEmail, userName, subject, body);
     }
@@ -91,10 +93,13 @@ public class EmailService : IEmailService
             var fromEmail = _configuration["Brevo:FromEmail"] ?? "noreplythaekdar@gmail.com";
             var fromName = _configuration["Brevo:FromName"] ?? "Thekdar";
 
+            // Log configuration status
+            _logger.LogInformation($"Brevo Config - HasApiKey: {!string.IsNullOrEmpty(apiKey)}, FromEmail: {fromEmail}, FromName: {fromName}");
+
             if (string.IsNullOrEmpty(apiKey))
             {
                 _logger.LogError("Brevo API key is missing from configuration");
-                throw new Exception("Email service not configured");
+                throw new Exception("Email service not configured - API key missing");
             }
 
             // Configure Brevo API
@@ -106,26 +111,30 @@ public class EmailService : IEmailService
             var sender = new SendSmtpEmailSender(fromName, fromEmail);
             var to = new List<SendSmtpEmailTo> { new SendSmtpEmailTo(toEmail, toName) };
             
+            var fullHtmlContent = $@"
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset='utf-8'>
+                    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+                    <title>{subject}</title>
+                </head>
+                <body style='font-family: Arial, sans-serif; padding: 20px;'>
+                    {htmlBody}
+                    <hr/>
+                    <p style='color: #888; font-size: 12px;'>Thekdar - Contractor Management System</p>
+                </body>
+                </html>";
+            
             var sendSmtpEmail = new SendSmtpEmail(
                 sender: sender,
                 to: to,
                 subject: subject,
-                htmlContent: $@"
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <meta charset='utf-8'>
-                        <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-                        <title>{subject}</title>
-                    </head>
-                    <body style='font-family: Arial, sans-serif; padding: 20px;'>
-                        {htmlBody}
-                        <hr/>
-                        <p style='color: #888; font-size: 12px;'>Thekdar - Contractor Management System</p>
-                    </body>
-                    </html>"
+                htmlContent: fullHtmlContent
             );
 
+            _logger.LogInformation($"Sending email via Brevo to {toEmail}");
+            
             var response = await apiInstance.SendTransacEmailAsync(sendSmtpEmail);
             
             _logger.LogInformation("Email sent successfully to {Email} via Brevo. MessageId: {MessageId}", 
