@@ -1,0 +1,197 @@
+@model Thekdar.ViewModels.InvoiceReportViewModel
+@using Thekdar.Models
+@{
+    ViewData["Title"] = "Invoices";
+    var selectedStatus = ViewBag.Status as string ?? "all";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <div>
+            <h2 class="mb-1">
+                <i class="fas fa-file-invoice-dollar text-primary me-2"></i>Invoice Report
+            </h2>
+            <p class="text-muted mb-0">Saved payroll records are available here as printable invoice-ready entries.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-controller="Payroll" asp-action="History" class="btn btn-outline-secondary">
+                <i class="fas fa-history me-2"></i>Payroll History
+            </a>
+            <a asp-controller="Wage" asp-action="Calculator" class="btn btn-success">
+                <i class="fas fa-calculator me-2"></i>New Calculation
+            </a>
+        </div>
+    </div>
+
+    <div class="alert alert-info border-0 shadow-sm">
+        <i class="fas fa-circle-info me-2"></i>
+        Full client invoicing is not built yet. This page currently reports saved payroll slips and links directly to the printable payslip view.
+    </div>
+
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">From Date</label>
+                    <input type="date" name="startDate" class="form-control" value="@ViewBag.StartDate" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">To Date</label>
+                    <input type="date" name="endDate" class="form-control" value="@ViewBag.EndDate" />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Status</label>
+                    <select name="status" class="form-select">
+                        <option value="all" selected="@(selectedStatus == "all")">All</option>
+                        <option value="Pending" selected="@(selectedStatus == "Pending")">Pending</option>
+                        <option value="PartiallyPaid" selected="@(selectedStatus == "PartiallyPaid")">Partially Paid</option>
+                        <option value="Paid" selected="@(selectedStatus == "Paid")">Paid</option>
+                        <option value="Overdue" selected="@(selectedStatus == "Overdue")">Overdue</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Search</label>
+                    <input type="text"
+                           name="searchTerm"
+                           class="form-control"
+                           value="@Model.SearchTerm"
+                           placeholder="Payslip #, worker, trade, contractor..." />
+                </div>
+                <div class="col-md-1 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row mb-4 g-3">
+        <div class="col-md-4">
+            <div class="card bg-primary text-white border-0 shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title">Total Invoices</h6>
+                    <h2 class="mb-0">@Model.TotalInvoices</h2>
+                    <small>Total payroll-backed invoice entries</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white border-0 shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title">Paid Amount</h6>
+                    <h2 class="mb-0">NPR @Model.PaidAmount.ToString("N0")</h2>
+                    <small>@Model.PaidInvoices paid invoice@(Model.PaidInvoices == 1 ? string.Empty : "s")</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-warning text-dark border-0 shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title">Outstanding</h6>
+                    <h2 class="mb-0">NPR @Model.OutstandingAmount.ToString("N0")</h2>
+                    <small>@Model.PendingInvoices unpaid or overdue invoice@(Model.PendingInvoices == 1 ? string.Empty : "s")</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            @if (!Model.Invoices.Any())
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-file-circle-xmark fa-4x text-muted mb-3"></i>
+                    <p class="fs-5 text-muted mb-1">No invoice-ready payroll records found.</p>
+                    <p class="text-muted">Create payroll records first, then they will appear here.</p>
+                    <a asp-controller="Wage" asp-action="Calculator" class="btn btn-primary">
+                        <i class="fas fa-calculator me-2"></i>Create Payroll
+                    </a>
+                </div>
+            }
+            else
+            {
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                    <div class="small text-muted">
+                        Total billed value: <span class="fw-semibold text-dark">NPR @Model.TotalNetAmount.ToString("N0")</span>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Payslip #</th>
+                                <th>Worker</th>
+                                <th>Contractor</th>
+                                <th>Period</th>
+                                <th>Days</th>
+                                <th>Net Amount</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var invoice in Model.Invoices)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@invoice.PayslipNumber</td>
+                                <td>
+                                    @invoice.WorkerName
+                                    <br />
+                                    <small class="text-muted">@invoice.WorkerTrade</small>
+                                </td>
+                                <td>@invoice.ContractorName</td>
+                                <td>@invoice.PeriodLabel</td>
+                                <td>@invoice.DaysWorked</td>
+                                <td class="fw-bold text-success">NPR @invoice.NetPayable.ToString("N0")</td>
+                                <td>
+                                    @switch (invoice.Status)
+                                    {
+                                        case PaymentStatus.Paid:
+                                            <span class="badge bg-success">Paid</span>
+                                            break;
+                                        case PaymentStatus.PartiallyPaid:
+                                            <span class="badge bg-info text-dark">Partially Paid</span>
+                                            break;
+                                        case PaymentStatus.Overdue:
+                                            <span class="badge bg-danger">Overdue</span>
+                                            break;
+                                        default:
+                                            <span class="badge bg-warning text-dark">Pending</span>
+                                            break;
+                                    }
+                                    @if (invoice.PaymentDate.HasValue)
+                                    {
+                                        <div class="small text-muted mt-1">@invoice.PaymentDate.Value.ToString("dd MMM yyyy")</div>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a asp-controller="Payroll"
+                                           asp-action="Payslip"
+                                           asp-route-id="@invoice.PayrollId"
+                                           class="btn btn-outline-primary"
+                                           title="Open payslip">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a asp-controller="Payroll"
+                                           asp-action="Payslip"
+                                           asp-route-id="@invoice.PayrollId"
+                                           asp-route-print="true"
+                                           target="_blank"
+                                           class="btn btn-outline-secondary"
+                                           title="Print payslip">
+                                            <i class="fas fa-print"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
