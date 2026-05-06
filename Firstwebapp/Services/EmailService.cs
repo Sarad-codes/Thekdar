@@ -89,8 +89,14 @@ public class EmailService : IEmailService
     {
         try
         {
+            // Validate email address
+            if (string.IsNullOrWhiteSpace(toEmail) || !IsValidEmail(toEmail))
+            {
+                throw new ArgumentException("Invalid recipient email address");
+            }
+
             var apiKey = _configuration["Brevo:ApiKey"];
-            var fromEmail = _configuration["Brevo:FromEmail"] ?? "noreplythaekdar@gmail.com";
+            var fromEmail = _configuration["Brevo:FromEmail"] ?? "noreplytheakdar@gmail.com";
             var fromName = _configuration["Brevo:FromName"] ?? "Thekdar";
 
             // Log configuration status
@@ -145,6 +151,19 @@ public class EmailService : IEmailService
             _logger.LogError(ex, "Failed to send email to {Email} via Brevo. Error: {Message}", 
                 toEmail, ex.Message);
             throw;
+        }
+    }
+
+    private bool IsValidEmail(string email)
+    {
+        try
+        {
+            var addr = new System.Net.Mail.MailAddress(email);
+            return addr.Address == email;
+        }
+        catch
+        {
+            return false;
         }
     }
 }
